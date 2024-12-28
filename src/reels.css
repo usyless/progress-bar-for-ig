@@ -1,0 +1,71 @@
+.usy-progress-bar-container {
+    box-sizing: border-box;
+    border-width: 0;
+
+    overflow: hidden;
+
+    * {
+        box-sizing: border-box;
+    }
+
+    position: absolute;
+    bottom: 0;
+    min-height: 15px;
+    height: 15px;
+    max-height: 15px;
+    cursor: pointer;
+    width: 100%;
+    z-index: 9999999999999;
+
+    &:hover .usy-progress-bar, .usy-progress-bar.usy-holding {
+        height: 6px;
+        opacity: 1;
+
+        &::after {
+            opacity: 0.2;
+            height: 6px;
+        }
+    }
+
+    &:not(:hover) .usy-progress-bar-hidden:not(.usy-holding) {
+        opacity: 0;
+    }
+
+    .usy-progress-bar {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        min-height: 3px;
+        height: 3px;
+        max-height: 6px;
+        width: 0;
+        z-index: 9999;
+        background: linear-gradient(to top, white, lightgray);
+        transition: width var(--remainingTime, 0s) linear, height 0.2s, opacity 0.2s, border 0.2s;
+
+        border-width: 0;
+        border-style: solid;
+        border-top-right-radius: 3px;
+        border-bottom-right-radius: 3px;
+
+        opacity: 0.4;
+
+        &::after {
+            content: "";
+            width: 100vw;
+            background-color: white;
+            opacity: 0;
+            min-height: 3px;
+            height: 3px;
+            max-height: 6px;
+            position: absolute;
+            bottom: 0;
+            pointer-events: none;
+            transition: height 0.2s, opacity 0.2s;
+        }
+
+        &.usy-holding, &.usy-holding::after {
+            transition: width 0s, height 0.2s, opacity 0.2s;
+        }
+    }
+}
