@@ -1,6 +1,6 @@
-# Progress bar for IG
+# Progress bar for Instagram
 
-Adds progress bars to all videos on IG
+Adds progress bars to all videos on Instagram
 
 **Screenshots available on the Mozilla addons page**
 
