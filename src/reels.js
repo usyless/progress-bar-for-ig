@@ -1,10 +1,19 @@
 'use strict';
 
-(async () => {
-    const Settings = await getSettings();
+(() => {
+    const Settings = {
+        preferences: {
+            show_bar: true,
+        },
 
-    class Video {
-        static addProgressBar(reel) {
+        loadSettings: async () => {
+            const data = await chrome.storage.local.get(), settings = ['preferences'];
+            for (const setting of settings) for (const s in Settings[setting]) Settings[setting][s] = data[s] ?? Settings[setting][s];
+        }
+    }
+
+    const Video = {
+        addProgressBar: (reel) => {
             let holding = false;
             let duration = reel.duration || 1, currentTime = 0;
             const updaters = [], update = () => {
@@ -83,16 +92,16 @@
                 document.addEventListener('pointerup', stopHold, {once: true});
                 document.addEventListener('pointermove', moveListener);
             });
-        }
+        },
 
-        static addProgressBars() {
+        addProgressBars: () => {
             for (const reel of document.body.querySelectorAll('video:not([usy-progress-bar])')) {
                 reel.setAttribute('usy-progress-bar', '');
                 Video.addProgressBar(reel);
             }
-        }
+        },
 
-        static ClearAll() {
+        ClearAll: () => {
             for (const reel of document.body.querySelectorAll('video[usy-progress-bar]')) {
                 reel.parentElement.querySelector('div.usy-progress-bar-container')?.remove();
                 reel.removeAttribute('usy-progress-bar');
@@ -103,16 +112,17 @@
     {
         Video.ClearAll();
         let lastUpdate = performance.now(), updateTimer = null;
-        const updateFunc = Video.addProgressBars, updateTime = 500;
         const observerSettings = {subtree: true, childList: true};
+        const updateFunc = (o) => {
+            o.disconnect();
+            Video.addProgressBars();
+            o.observe(document.body, observerSettings);
+        };
+        const updateFrequency = 500;
         const observer = new MutationObserver((_, o) => {
             clearTimeout(updateTimer);
-            if (performance.now() - lastUpdate > updateTime) {
-                o.disconnect();
-                updateFunc();
-                o.observe(document.body, observerSettings);
-            }
-            else updateTimer = setTimeout(updateFunc, updateTime);
+            if (performance.now() - lastUpdate > updateFrequency) updateFunc(o);
+            else updateTimer = setTimeout(updateFunc, updateFrequency, o);
             lastUpdate = performance.now();
         });
         observer.observe(document.body, observerSettings);
@@ -124,21 +134,4 @@
             Video.ClearAll();
         }
     });
-
-    async function getSettings() { // Setting handling
-        class Settings {
-            preferences = {
-                show_bar: true,
-            }
-
-            async loadSettings() {
-                const data = await chrome.storage.local.get(), settings = ['preferences'];
-                for (const setting of settings) for (const s in this[setting]) this[setting][s] = data[s] ?? this[setting][s];
-            }
-        }
-
-        const set = new Settings();
-        await set.loadSettings();
-        return set;
-    }
 })();
