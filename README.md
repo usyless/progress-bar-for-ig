@@ -1,10 +1,10 @@
-# Progress bar for Instagram
+<h1 align="center"><img src="https://github.com/usyless/progress-bar-for-ig/blob/main/src/icons/icon.svg?raw=true" width="160" height="160" alt="logo"><br>Progress bar for Instagram</h1>
 
 Adds progress bars to all videos on Instagram
 
 **Screenshots available on the Mozilla addons page**
 
-## Installation
+# Installation
 
 - **Firefox Desktop/Mobile (or Fennec)**
 	- Install extension through the [Mozilla addons page](https://addons.mozilla.org/en-GB/firefox/addon/progress-bar-for-ig/)
