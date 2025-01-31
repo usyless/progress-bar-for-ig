@@ -28,7 +28,7 @@
         }
     }
 
-    &:hover {
+    &:hover, &:has(.usy-progress-bar.usy-holding) {
         background: linear-gradient(to bottom, transparent, #00000066);
 
         &::after, &::before {
