@@ -2,7 +2,8 @@
     box-sizing: border-box;
     border-width: 0;
 
-    overflow-x: hidden;
+    overflow-y: visible;
+    overflow-x: clip;
 
     * {
         box-sizing: border-box;
@@ -27,8 +28,40 @@
         }
     }
 
+    &:hover {
+        background: linear-gradient(to bottom, transparent, #00000066);
+
+        &::after, &::before {
+            opacity: 1;
+        }
+    }
+
     &:not(:hover) .usy-progress-bar-hidden:not(.usy-holding) {
         opacity: 0;
+    }
+
+    &::before {
+        color: transparent !important;
+        background-color: #000000aa;
+        border: 5px solid #000000aa;
+        border-radius: 9px;
+        transform: translateX(-50%) !important;
+        filter: blur(10px);
+        bottom: 23px !important;
+    }
+
+    &::after, &::before {
+        content: var(--time, "0:00/0:00");
+        color: white;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: 30px;
+        z-index: 100;
+        font-size: 32px;
+        font-weight: bold;
+        opacity: 0;
+        transition: 0.2s;
     }
 
     .usy-progress-bar {
@@ -40,7 +73,7 @@
         max-height: 6px;
         width: 0;
         z-index: 9999;
-        background: linear-gradient(to top, white, lightgray);
+        background-color: white;
         transition: width var(--remainingTime, 0s) linear, height 0.2s, opacity 0.2s, border 0.2s;
 
         border-width: 0;

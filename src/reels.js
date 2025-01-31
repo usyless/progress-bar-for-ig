@@ -6,10 +6,17 @@
             show_bar: true,
         },
 
-        loadSettings: async () => {
-            const data = await chrome.storage.local.get(), settings = ['preferences'];
-            for (const setting of settings) for (const s in Settings[setting]) Settings[setting][s] = data[s] ?? Settings[setting][s];
-        }
+        loadSettings: () => new Promise(resolve => {
+            chrome.storage.local.get(['preferences'], (s) => {
+                for (const setting of ['preferences']) Settings[setting] = {...Settings[setting], ...s[setting]};
+                resolve();
+            });
+        }),
+    }
+
+    const formatTime = (time) => {
+        time = parseInt(time);
+        return `${Math.floor(time / 60).toString()}:${(time % 60).toString().padStart(2, '0')}`;
     }
 
     const Video = {
@@ -34,6 +41,10 @@
             const updateTime = () => currentTime = reel.currentTime;
             reel.addEventListener('timeupdate', updateTime);
 
+            const updateTimeDisplay = () => {
+                barBoxContainer.style.setProperty('--time', `"${formatTime(currentTime)}/${formatTime(duration)}"`);
+            }
+
             const smoothBar = () => {
                 bar.style.setProperty('--remainingTime', `${duration - currentTime}s`);
                 bar.style.width = '100%';
@@ -42,6 +53,7 @@
             const init = () => {
                 updateTime();
                 duration = reel.duration;
+                updateTimeDisplay();
                 if (!holding && !reel.paused) {
                     bar.style.removeProperty('--remainingTime');
                     update();
@@ -125,13 +137,14 @@
             else updateTimer = setTimeout(updateFunc, updateFrequency, o);
             lastUpdate = performance.now();
         });
-        observer.observe(document.body, observerSettings);
+        Settings.loadSettings().then(() => {
+            observer.observe(document.body, observerSettings);
+        });
     }
 
     chrome.storage.onChanged.addListener(async (_, namespace) => {
         if (namespace === 'local') {
-            await Settings.loadSettings();
-            Video.ClearAll();
+            Settings.loadSettings().then(Video.ClearAll);
         }
     });
 })();
