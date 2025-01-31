@@ -40,16 +40,6 @@
         opacity: 0;
     }
 
-    &::before {
-        color: transparent !important;
-        background-color: #000000aa;
-        border: 5px solid #000000aa;
-        border-radius: 9px;
-        transform: translateX(-50%) !important;
-        filter: blur(10px);
-        bottom: 23px !important;
-    }
-
     &::after, &::before {
         content: var(--time, "0:00/0:00");
         color: white;
@@ -62,6 +52,15 @@
         font-weight: bold;
         opacity: 0;
         transition: 0.2s;
+    }
+
+    &::before {
+        color: transparent;
+        background-color: #000000aa;
+        border: 5px solid #000000aa;
+        border-radius: 9px;
+        filter: blur(10px);
+        bottom: 23px;
     }
 
     .usy-progress-bar {
