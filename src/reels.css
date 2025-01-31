@@ -2,7 +2,7 @@
     box-sizing: border-box;
     border-width: 0;
 
-    overflow: hidden;
+    overflow-x: hidden;
 
     * {
         box-sizing: border-box;
