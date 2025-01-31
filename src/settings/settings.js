@@ -1,14 +1,20 @@
+'use strict';
+
 if (typeof browser === 'undefined') {
     var browser = chrome;
 }
 
-const DIV = document.getElementById('settings');
+(() => {
+    document.getElementById('versionDisplay').textContent += chrome?.runtime?.getManifest?.()?.version;
 
-const options = {
+    const DIV = document.getElementById('settings');
+
+    const options = {
     'Preferences': [
         {
             name: 'show_bar',
             description: 'Show faint small progress bar when not hovering',
+            category: 'preferences',
             default: true
         },
     ],
@@ -28,64 +34,73 @@ const options = {
         }
     ]
 }
-const typeMap = {
-    button: create_button,
-}
-let values;
-for (const section in options) {
-    const outer = document.createElement('div'), h = document.createElement('h3');
-    h.textContent = section;
-    outer.appendChild(h);
-    for (const inner in options[section]) outer.appendChild(create(options[section][inner]));
-    DIV.appendChild(outer);
-}
 
-function create(elem) {
-    elem.init?.();
-    return typeMap[elem.type]?.(elem) ?? create_checkbox(elem);
-}
+    const valuesToUpdate = [];
+    const typeMap = {
+        button: (e) => {
+            const [outer, button] = get_generic_setting(e, 'button');
+            button.textContent = e.button;
+            button.addEventListener('click', e.onclick);
+            return outer;
+        },
+        checkbox: (e) => {
+            const [outer, checkbox] = get_generic_setting(e, 'input', true);
+            checkbox.setAttribute('type', 'checkbox');
+            valuesToUpdate.push({obj: e, func: (v) => checkbox.checked = v});
+            checkbox.addEventListener('change', (ev) => update_value(ev, e, 'checked'));
+            return outer;
+        }
+    }
 
-function create_checkbox(e) {
-    const [outer, checkbox] = get_generic_setting(e, 'input', true);
-    checkbox.setAttribute('type', 'checkbox');
-    get_value(e.name, e.default).then(v => checkbox.checked = v);
-    checkbox.addEventListener('change', toggle_value)
-    return outer;
-}
+    for (const section in options) {
+        const outer = document.createElement('div'), h = document.createElement('h3');
+        h.textContent = section;
+        outer.appendChild(h);
+        for (const inner in options[section]) outer.appendChild(create(options[section][inner]));
+        DIV.appendChild(outer);
+    }
 
-function create_button(e) {
-    const [outer, button] = get_generic_setting(e, 'button');
-    button.textContent = e.button;
-    button.addEventListener('click', e.onclick);
-    return outer;
-}
+    chrome.storage.local.get(valuesToUpdate.map(i => i.obj.category ?? i.obj.name), (s) => {
+        for (const {obj, func} of valuesToUpdate) {
+            if (obj.category != null) func(s[obj.category]?.[obj.name] ?? obj.default);
+            else func(s[obj.name] ?? obj.default);
+        }
+        valuesToUpdate.length = 0;
+    });
 
-function get_generic_setting(e, element, flipOrder) {
-    const outer = document.createElement('div'), label = document.createElement('label'), elem = document.createElement(element);
-    label.textContent = e.description;
-    label.setAttribute('for', e.name);
-    elem.id = e.name;
-    if (e.class) elem.classList.add(...e.class);
-    if (flipOrder) outer.append(elem, label);
-    else outer.append(label, elem);
-    return [outer, elem];
-}
+    function create(elem) {
+        elem.init?.();
+        return typeMap[elem.type ?? 'checkbox'](elem);
+    }
 
-async function get_value(value, def, refresh=false) {
-    if (!values || refresh) values = await browser.storage.local.get();
-    return values[value] ?? def;
-}
+    function get_generic_setting(e, element, flipOrder) {
+        const outer = document.createElement('div'), label = document.createElement('label'), elem = document.createElement(element);
+        label.textContent = e.description;
+        label.setAttribute('for', e.name);
+        elem.id = e.name;
+        if (e.class) elem.classList.add(...e.class);
+        if (flipOrder) outer.append(elem, label);
+        else outer.append(label, elem);
+        return [outer, elem];
+    }
 
-function toggle_value(e) {
-    const data = {};
-    data[e.target.id] = e.target.checked;
-    setStorage(data);
-}
+    function update_value(e, obj, property) {
+        chrome.storage.local.get([obj.category ?? obj.name], (r) => {
+            if (obj.category != null) {
+                if (r[obj.category] == null) r[obj.category] = {};
+                r[obj.category][obj.name] = e.target[property];
+            } else {
+                r[obj.name] = e.target[property];
+            }
+            setStorage(r);
+        });
+    }
 
-async function setStorage(data) {
-    await chrome.storage.local.set(data);
-}
+    function setStorage(data) {
+        chrome.storage.local.set(data); // potentially add little saved message with .then
+    }
 
-function clearStorage() {
-    chrome.storage.local.clear();
-}
+    function clearStorage() {
+        chrome.storage.local.clear();
+    }
+})();
