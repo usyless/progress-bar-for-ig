@@ -53,9 +53,9 @@
 
             const smoothBar = () => {
                 if (previousTime > currentTime) {
-                    bar.style.removeProperty('--remainingTime');
+                    bar.style.setProperty('--remainingTime', '0s');
                     bar.style.width = '0';
-                    bar.offsetHeight; // Reflow
+                    void(bar.offsetHeight); // Reflow
                 } else {
                     bar.style.setProperty('--remainingTime', `${duration - currentTime}s`);
                     bar.style.width = '100%';
@@ -71,7 +71,7 @@
 
             reel.addEventListener('timeupdate', init);
             reel.addEventListener('pause', () => {
-                bar.style.removeProperty('--remainingTime');
+                bar.style.setProperty('--remainingTime', '0s');
                 setTimeout(setWidth);
             });
             reel.addEventListener('play', init);
