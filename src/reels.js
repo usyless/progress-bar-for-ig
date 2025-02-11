@@ -14,12 +14,12 @@
                 resolve();
             });
         }),
-    }
+    };
 
     const formatTime = (time) => {
         time = parseInt(time);
         return `${Math.floor(time / 60).toString()}:${(time % 60).toString().padStart(2, '0')}`;
-    }
+    };
 
     const Video = {
         addProgressBar: (reel) => {
@@ -128,7 +128,7 @@
                 reel.removeAttribute('usy-progress-bar');
             }
         }
-    }
+    };
 
     {
         Video.ClearAll();
