@@ -10,48 +10,50 @@ if (typeof browser === 'undefined') {
     const DIV = document.getElementById('settings');
 
     const options = {
-    'Preferences': [
-        {
-            name: 'show_bar',
-            description: 'Show faint small progress bar when not hovering',
-            category: 'preferences',
-            default: true
-        },
-        {
-            name: 'show_progress',
-            description: 'Show video progress on progress bar hover',
-            category: 'preferences',
-            default: true
-        },
-        {
-            name: 'video_start_at_beginning_fix',
-            description: 'Try fix bug where videos do not start at the very beginning always',
-            category: 'preferences',
-            default: false
-        },
-        {
-            name: 'share_button_reels_bug_fix',
-            description: 'Try fix reels scroll position reset bug with share/like buttons on reels',
-            category: 'preferences',
-            default: false
-        }
-    ],
-    'Extras': [
-        {
-            name: 'reset_all_settings',
-            description: '',
-            type: 'button',
-            button: 'Reset to DEFAULT settings',
-            class: ['warning'],
-            onclick: () => {
-                if (confirm('Are you sure you want to RESET this extensions settings?')) {
-                    clearStorage();
-                    window.location.reload();
+        'Preferences': [
+            {
+                name: 'show_bar',
+                description: 'Show faint small progress bar when not hovering',
+                category: 'preferences',
+                default: true
+            },
+            {
+                name: 'show_progress',
+                description: 'Show video progress on progress bar hover',
+                category: 'preferences',
+                default: true
+            }
+        ],
+        'Bug Fixes': [
+            {
+                name: 'video_start_at_beginning_fix',
+                description: 'Try fix bug where videos do not start at the very beginning always',
+                category: 'preferences',
+                default: false
+            },
+            {
+                name: 'share_button_bug_fix',
+                description: 'Try fix scroll position reset bug with share/like buttons on reels',
+                category: 'preferences',
+                default: false
+            }
+        ],
+        'Extras': [
+            {
+                name: 'reset_all_settings',
+                description: '',
+                type: 'button',
+                button: 'Reset to DEFAULT settings',
+                class: ['warning'],
+                onclick: () => {
+                    if (confirm('Are you sure you want to RESET this extensions settings?')) {
+                        clearStorage();
+                        window.location.reload();
+                    }
                 }
             }
-        }
-    ]
-}
+        ]
+    }
 
     const valuesToUpdate = [];
     const typeMap = {

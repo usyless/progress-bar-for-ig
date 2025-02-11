@@ -6,7 +6,7 @@
             show_bar: true,
             show_progress: true,
             video_start_at_beginning_fix: false,
-            share_button_reels_bug_fix: false
+            share_button_bug_fix: false
         },
 
         loadSettings: () => new Promise(resolve => {
@@ -142,7 +142,7 @@
             for (const reel of document.body.querySelectorAll('video:not([usy-progress-bar])')) {
                 reel.setAttribute('usy-progress-bar', '');
                 Video.addProgressBar(reel);
-                if (onReels && Settings.preferences.share_button_reels_bug_fix) Video.fixShareButtonBug(reel);
+                if (onReels && Settings.preferences.share_button_bug_fix) Video.fixShareButtonBug(reel);
             }
         },
 
