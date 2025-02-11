@@ -5,7 +5,8 @@
         preferences: {
             show_bar: true,
             show_progress: true,
-            video_start_at_beginning_fix: false
+            video_start_at_beginning_fix: false,
+            share_button_reels_bug_fix: false
         },
 
         loadSettings: () => new Promise(resolve => {
@@ -20,6 +21,8 @@
         time = parseInt(time);
         return `${Math.floor(time / 60).toString()}:${(time % 60).toString().padStart(2, '0')}`;
     };
+
+    let onReels = location.pathname.includes('/reels/');
 
     const Video = {
         addProgressBar: (reel) => {
@@ -114,10 +117,32 @@
             });
         },
 
+        fixShareButtonBug: (reel) => {
+            const shareButton = reel.closest('div.x78zum5.xedcshv').nextElementSibling;
+            if (shareButton) {
+                let scroll;
+                shareButton.addEventListener('pointerdown', () => {
+                    scroll = document.querySelector('main').firstElementChild.scrollTop;
+                }, {capture: true});
+                shareButton.addEventListener('click', () => {
+                    document.querySelector('main').firstElementChild.scrollTop = scroll;
+                    setTimeout(() => {
+                        document.querySelector('main').firstElementChild.scrollTop = scroll;
+                        document.querySelector('div.x1n2onr6.xzkaem6')?.addEventListener('click', (e) => {
+                            setTimeout(() => {
+                                document.querySelector('main').firstElementChild.scrollTop = scroll;
+                            }, 100);
+                        }, {capture: true});
+                    }, 100);
+                });
+            }
+        },
+
         addProgressBars: () => {
             for (const reel of document.body.querySelectorAll('video:not([usy-progress-bar])')) {
                 reel.setAttribute('usy-progress-bar', '');
                 Video.addProgressBar(reel);
+                if (onReels && Settings.preferences.share_button_reels_bug_fix) Video.fixShareButtonBug(reel);
             }
         },
 
@@ -135,6 +160,7 @@
         Settings.loadSettings().then(() => {
             (new MutationObserver((_, o) => {
                 o.disconnect();
+                onReels = location.pathname.includes('/reels/');
                 Video.addProgressBars();
                 o.observe(document.body, observerSettings);
             })).observe(document.body, observerSettings);

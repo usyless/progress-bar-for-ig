@@ -28,6 +28,12 @@ if (typeof browser === 'undefined') {
             description: 'Try fix bug where videos do not start at the very beginning always',
             category: 'preferences',
             default: false
+        },
+        {
+            name: 'share_button_reels_bug_fix',
+            description: 'Try fix reels progress reset bug with share/like buttons on reels',
+            category: 'preferences',
+            default: false
         }
     ],
     'Extras': [
