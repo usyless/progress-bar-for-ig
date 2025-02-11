@@ -23,6 +23,8 @@
 
     const Video = {
         addProgressBar: (reel) => {
+            if (Settings.restart_video_on_view) reel.currentTime = 0;
+
             let holding = false;
             let duration = reel.duration || 1, currentTime = 0;
             const updaters = [], update = () => {

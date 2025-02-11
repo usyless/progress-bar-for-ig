@@ -22,6 +22,12 @@ if (typeof browser === 'undefined') {
             description: 'Show video progress on progress bar hover',
             category: 'preferences',
             default: true
+        },
+        {
+            name: 'restart_video_on_view',
+            description: 'Set all videos to the beginning each time you come across them',
+            category: 'preferences',
+            default: false
         }
     ],
     'Extras': [
