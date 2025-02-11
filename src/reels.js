@@ -26,9 +26,7 @@
 
     const Video = {
         addProgressBar: (reel) => {
-            let holding = false;
-            let previousTime = Infinity;
-            let duration = reel.duration || 1, currentTime = 0;
+            let holding = false, duration;
 
             const barBoxContainer = document.createElement('div');
             barBoxContainer.classList.add('usy-progress-bar-container');
@@ -38,48 +36,42 @@
             if (!Settings.preferences.show_bar) bar.classList.add('usy-progress-bar-hidden');
             if (!Settings.preferences.show_progress) barBoxContainer.classList.add('no-progress');
             barBoxContainer.appendChild(bar);
-            const setWidth = () => bar.style.width = `${(currentTime / duration) * 100}%`;
-
+            const setWidth = () => bar.style.width = `${(reel.currentTime / duration) * 100}%`;
             reel.after(barBoxContainer);
 
-            const updateTime = () => {
-                previousTime = currentTime;
-                currentTime = reel.currentTime;
-            };
-            reel.addEventListener('timeupdate', updateTime);
-
-            const updateTimeDisplay = () => {
-                barBoxContainer.style.setProperty('--time', `"${formatTime(currentTime)}/${formatTime(duration)}"`);
-            }
-
-            const smoothBar = () => {
-                if (previousTime > currentTime) {
-                    bar.style.setProperty('--remainingTime', '0s');
-                    bar.style.width = '0';
-                    void(bar.offsetHeight); // Reflow
-                } else {
-                    bar.style.setProperty('--remainingTime', `${duration - currentTime}s`);
-                    bar.style.width = '100%';
+            const init = () => {
+                if (duration) {
+                    barBoxContainer.style.setProperty('--time', `"${formatTime(reel.currentTime)}/${formatTime(duration)}"`);
+                    if (!holding && !reel.paused) {
+                        bar.style.setProperty('--remainingTime', `${duration - reel.currentTime}s`);
+                        bar.style.width = '100%';
+                    }
                 }
             }
 
-            const init = () => {
-                updateTime();
-                duration = reel.duration;
-                updateTimeDisplay();
-                if (!holding && !reel.paused) setTimeout(smoothBar);
+            const onPauseEnd = () => {
+                bar.style.setProperty('--remainingTime', '0s');
+                setWidth();
+                void(bar.offsetHeight); // Reflow
+            };
+
+            {
+                const initialiseDuration = () => {
+                    duration = reel.duration;
+                    setWidth();
+                };
+                if (reel.readyState >= 1) initialiseDuration();
+                else reel.addEventListener('loadedmetadata', initialiseDuration, {once: true});
             }
 
-            reel.addEventListener('timeupdate', init);
-            reel.addEventListener('pause', () => {
-                bar.style.setProperty('--remainingTime', '0s');
-                setTimeout(setWidth);
-            });
+            reel.addEventListener('ended', onPauseEnd);
             reel.addEventListener('play', init);
+            reel.addEventListener('pause', onPauseEnd);
+            reel.addEventListener('timeupdate', init);
 
             const updateBarFromMouse = (e) => {
-                reel.currentTime = Math.max(0, Math.min(((e.clientX - barBoxContainer.getBoundingClientRect().left) / barBoxContainer.offsetWidth) * duration, duration));
-                updateTime();
+                const box = barBoxContainer.getBoundingClientRect();
+                reel.currentTime = Math.max(0, Math.min(((e.clientX - box.left) / box.width) * duration, duration));
                 setWidth();
                 if (!holding) bar.classList.remove('usy-holding');
             }
