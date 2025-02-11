@@ -26,10 +26,8 @@
             if (Settings.video_start_at_beginning_fix) reel.currentTime = 0;
 
             let holding = false;
+            let previousTime = Infinity;
             let duration = reel.duration || 1, currentTime = 0;
-            const updaters = [], update = () => {
-                for (const u of updaters) u();
-            }
 
             const barBoxContainer = document.createElement('div');
             barBoxContainer.classList.add('usy-progress-bar-container');
@@ -39,11 +37,14 @@
             if (!Settings.preferences.show_bar) bar.classList.add('usy-progress-bar-hidden');
             if (!Settings.preferences.show_progress) barBoxContainer.classList.add('no-progress');
             barBoxContainer.appendChild(bar);
-            updaters.push(() => bar.style.width = `${(currentTime / duration) * 100}%`);
+            const setWidth = () => bar.style.width = `${(currentTime / duration) * 100}%`;
 
             reel.after(barBoxContainer);
 
-            const updateTime = () => currentTime = reel.currentTime;
+            const updateTime = () => {
+                previousTime = currentTime;
+                currentTime = reel.currentTime;
+            };
             reel.addEventListener('timeupdate', updateTime);
 
             const updateTimeDisplay = () => {
@@ -51,12 +52,12 @@
             }
 
             const smoothBar = () => {
-                const remaining = duration - currentTime;
-                if (remaining < 0.4) {
+                if (previousTime > currentTime) {
+                    bar.style.removeProperty('--remainingTime');
                     bar.style.width = '0';
                     bar.offsetHeight; // Reflow
                 } else {
-                    bar.style.setProperty('--remainingTime', `${remaining}s`);
+                    bar.style.setProperty('--remainingTime', `${duration - currentTime}s`);
                     bar.style.width = '100%';
                 }
             }
@@ -65,24 +66,20 @@
                 updateTime();
                 duration = reel.duration;
                 updateTimeDisplay();
-                if (!holding && !reel.paused) {
-                    bar.style.removeProperty('--remainingTime');
-                    update();
-                    setTimeout(smoothBar);
-                }
+                if (!holding && !reel.paused) setTimeout(smoothBar);
             }
 
             reel.addEventListener('timeupdate', init);
             reel.addEventListener('pause', () => {
                 bar.style.removeProperty('--remainingTime');
-                setTimeout(update);
+                setTimeout(setWidth);
             });
             reel.addEventListener('play', init);
 
             const updateBarFromMouse = (e) => {
                 reel.currentTime = Math.max(0, Math.min(((e.clientX - barBoxContainer.getBoundingClientRect().left) / barBoxContainer.offsetWidth) * duration, duration));
                 updateTime();
-                update();
+                setWidth();
                 if (!holding) bar.classList.remove('usy-holding');
             }
 
