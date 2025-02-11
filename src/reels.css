@@ -41,6 +41,8 @@
     }
 
     &::after, &::before {
+        pointer-events: none;
+        user-select: none;
         content: var(--time, "0:00/0:00");
         color: white;
         position: absolute;
