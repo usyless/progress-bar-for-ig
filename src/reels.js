@@ -4,7 +4,8 @@
     const Settings = {
         preferences: {
             show_bar: true,
-            show_progress: true
+            show_progress: true,
+            restart_video_on_view: false
         },
 
         loadSettings: () => new Promise(resolve => {
@@ -131,22 +132,13 @@
 
     {
         Video.ClearAll();
-        let lastUpdate = performance.now(), updateTimer = null;
         const observerSettings = {subtree: true, childList: true};
-        const updateFunc = (o) => {
-            o.disconnect();
-            Video.addProgressBars();
-            o.observe(document.body, observerSettings);
-        };
-        const updateFrequency = 500;
-        const observer = new MutationObserver((_, o) => {
-            clearTimeout(updateTimer);
-            if (performance.now() - lastUpdate > updateFrequency) updateFunc(o);
-            else updateTimer = setTimeout(updateFunc, updateFrequency, o);
-            lastUpdate = performance.now();
-        });
         Settings.loadSettings().then(() => {
-            observer.observe(document.body, observerSettings);
+            (new MutationObserver((_, o) => {
+                o.disconnect();
+                Video.addProgressBars();
+                o.observe(document.body, observerSettings);
+            })).observe(document.body, observerSettings);
         });
     }
 
