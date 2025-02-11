@@ -31,7 +31,7 @@ if (typeof browser === 'undefined') {
         },
         {
             name: 'share_button_reels_bug_fix',
-            description: 'Try fix reels progress reset bug with share/like buttons on reels',
+            description: 'Try fix reels scroll position reset bug with share/like buttons on reels',
             category: 'preferences',
             default: false
         }
