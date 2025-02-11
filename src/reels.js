@@ -46,8 +46,14 @@
             }
 
             const smoothBar = () => {
-                bar.style.setProperty('--remainingTime', `${duration - currentTime}s`);
-                bar.style.width = '100%';
+                const remaining = duration - currentTime;
+                if (remaining < 0.4) {
+                    bar.style.width = '0';
+                    bar.offsetHeight; // Reflow
+                } else {
+                    bar.style.setProperty('--remainingTime', `${remaining}s`);
+                    bar.style.width = '100%';
+                }
             }
 
             const init = () => {
