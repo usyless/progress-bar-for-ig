@@ -26,8 +26,6 @@
 
     const Video = {
         addProgressBar: (reel) => {
-            if (Settings.video_start_at_beginning_fix) reel.currentTime = 0;
-
             let holding = false;
             let previousTime = Infinity;
             let duration = reel.duration || 1, currentTime = 0;
@@ -142,6 +140,9 @@
             for (const reel of document.body.querySelectorAll('video:not([usy-progress-bar])')) {
                 reel.setAttribute('usy-progress-bar', '');
                 Video.addProgressBar(reel);
+
+                // Bug fixes
+                if (Settings.video_start_at_beginning_fix) reel.currentTime = 0;
                 if (onReels && Settings.preferences.share_button_bug_fix) Video.fixShareButtonBug(reel);
             }
         },
