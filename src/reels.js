@@ -4,6 +4,7 @@
     const Settings = {
         preferences: {
             show_bar: true,
+            show_progress: true
         },
 
         loadSettings: () => new Promise(resolve => {
@@ -33,6 +34,7 @@
             const bar = document.createElement('div');
             bar.classList.add('usy-progress-bar');
             if (!Settings.preferences.show_bar) bar.classList.add('usy-progress-bar-hidden');
+            if (!Settings.preferences.show_progress) barBoxContainer.classList.add('no-progress');
             barBoxContainer.appendChild(bar);
             updaters.push(() => bar.style.width = `${(currentTime / duration) * 100}%`);
 

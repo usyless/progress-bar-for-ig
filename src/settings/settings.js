@@ -17,6 +17,12 @@ if (typeof browser === 'undefined') {
             category: 'preferences',
             default: true
         },
+        {
+            name: 'show_progress',
+            description: 'Show video progress on progress bar hover',
+            category: 'preferences',
+            default: true
+        }
     ],
     'Extras': [
         {

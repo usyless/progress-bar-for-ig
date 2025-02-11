@@ -65,6 +65,12 @@
         bottom: 23px;
     }
 
+    &.no-progress {
+        &::before, &::after {
+            display: none !important;
+        }
+    }
+
     .usy-progress-bar {
         position: absolute;
         bottom: 0;
