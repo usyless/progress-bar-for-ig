@@ -24,8 +24,8 @@ if (typeof browser === 'undefined') {
             default: true
         },
         {
-            name: 'restart_video_on_view',
-            description: 'Set all videos to the beginning each time you come across them',
+            name: 'video_start_at_beginning_fix',
+            description: 'Try fix bug where videos do not start at the very beginning always',
             category: 'preferences',
             default: false
         }

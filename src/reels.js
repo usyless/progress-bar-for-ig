@@ -5,7 +5,7 @@
         preferences: {
             show_bar: true,
             show_progress: true,
-            restart_video_on_view: false
+            video_start_at_beginning_fix: false
         },
 
         loadSettings: () => new Promise(resolve => {
@@ -23,7 +23,7 @@
 
     const Video = {
         addProgressBar: (reel) => {
-            if (Settings.restart_video_on_view) reel.currentTime = 0;
+            if (Settings.video_start_at_beginning_fix) reel.currentTime = 0;
 
             let holding = false;
             let duration = reel.duration || 1, currentTime = 0;
