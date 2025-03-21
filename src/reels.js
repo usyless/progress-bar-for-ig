@@ -108,8 +108,10 @@
             });
         },
 
+        getClosestReelContainer: (e) => e.closest('div.x78zum5.xedcshv'),
+
         fixShareButtonBug: (reel) => {
-            const shareButton = reel.closest('div.x78zum5.xedcshv')?.nextElementSibling;
+            const shareButton = Video.getClosestReelContainer(reel)?.nextElementSibling;
             if (shareButton) {
                 let scroll;
                 shareButton.addEventListener('pointerdown', () => {
@@ -130,7 +132,7 @@
         },
 
         preventExtraMenus: (reel) => {
-            reel.closest('div.x78zum5.xedcshv')?.nextElementSibling?.firstElementChild?.lastElementChild?.addEventListener('click', (e) => {
+            Video.getClosestReelContainer(reel)?.nextElementSibling?.firstElementChild?.lastElementChild?.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 e.stopImmediatePropagation();
@@ -140,7 +142,7 @@
         },
 
         likeVideo: (reel) => {
-            reel.closest('div.x78zum5.xedcshv')?.nextElementSibling?.firstElementChild?.firstElementChild?.firstElementChild?.firstElementChild?.click();
+            Video.getClosestReelContainer(reel)?.nextElementSibling?.firstElementChild?.firstElementChild?.firstElementChild?.firstElementChild?.click();
         },
 
         addProgressBars: () => {
