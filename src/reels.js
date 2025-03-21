@@ -135,7 +135,7 @@
                 e.stopPropagation();
                 e.stopImmediatePropagation();
 
-                e.currentTarget.parentElement.firstElementChild.click();
+                e.currentTarget.parentElement.firstElementChild.firstElementChild.firstElementChild.click();
             }, {capture: true});
         },
 
