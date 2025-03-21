@@ -126,3 +126,23 @@ body {
         }
     }
 }
+
+
+input[type="text"] {
+    background-color: var(--additional);
+    color: inherit;
+    border-radius: 7px;
+    border: solid var(--background-dark) 2px;
+    font: inherit;
+    flex-shrink: 1;
+    min-width: 100px;
+
+    &:active {
+        border-color: var(--additional-lighter);
+    }
+
+    &:focus-visible {
+        outline: none;
+        border-color: var(--additional-lighter);
+    }
+}
