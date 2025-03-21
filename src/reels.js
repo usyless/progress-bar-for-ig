@@ -150,7 +150,6 @@
                 reel.setAttribute('usy-progress-bar', '');
                 Video.addProgressBar(reel);
 
-                // Bug fixes
                 if (onReels) {
                     if (Settings.preferences.share_button_bug_fix) Video.fixShareButtonBug(reel);
                     if (Settings.preferences.prevent_extra_menus) Video.preventExtraMenus(reel);
