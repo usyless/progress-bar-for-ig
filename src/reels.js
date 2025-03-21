@@ -140,7 +140,7 @@
         },
 
         likeVideo: (reel) => {
-            reel.closest('div.x78zum5.xedcshv')?.nextElementSibling?.firstElementChild?.click();
+            reel.closest('div.x78zum5.xedcshv')?.nextElementSibling?.firstElementChild?.firstElementChild?.firstElementChild?.firstElementChild?.click();
         },
 
         addProgressBars: () => {
@@ -156,7 +156,7 @@
             }
         },
 
-        ClearAll: () => {
+        ClearAll: async () => {
             for (const reel of document.body.querySelectorAll('video[usy-progress-bar]')) {
                 reel.parentElement.querySelector('div.usy-progress-bar-container')?.remove();
                 reel.removeAttribute('usy-progress-bar');
@@ -165,7 +165,7 @@
     };
 
     window.addEventListener('keypress', (e) => {
-        if (onReels && e.key === Settings.preferences.custom_like_key) {
+        if (onReels && e.key.toLowerCase() === Settings.preferences.custom_like_key) {
             for (const reel of document.querySelectorAll('video')) {
                 if (!reel.paused) {
                     Video.likeVideo(reel);
@@ -176,21 +176,20 @@
     }, {capture: true});
 
     {
-        Video.ClearAll();
-        const observerSettings = {subtree: true, childList: true};
-        Settings.loadSettings().then(() => {
-            (new MutationObserver((_, o) => {
-                o.disconnect();
-                onReels = location.pathname.includes('/reels/');
-                Video.addProgressBars();
-                o.observe(document.body, observerSettings);
-            })).observe(document.body, observerSettings);
+        Video.ClearAll().then(() => {
+            const observerSettings = {subtree: true, childList: true};
+            Settings.loadSettings().then(() => {
+                (new MutationObserver((_, o) => {
+                    o.disconnect();
+                    onReels = location.pathname.includes('/reels/');
+                    Video.addProgressBars();
+                    o.observe(document.body, observerSettings);
+                })).observe(document.body, observerSettings);
+            });
         });
     }
 
     chrome.storage.onChanged.addListener(async (_, namespace) => {
-        if (namespace === 'local') {
-            Settings.loadSettings().then(Video.ClearAll);
-        }
+        if (namespace === 'local') Settings.loadSettings().then(Video.ClearAll).then(Video.addProgressBars);
     });
 })();

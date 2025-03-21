@@ -31,7 +31,7 @@ if (typeof browser === 'undefined') {
             },
             {
                 name: 'custom_like_key',
-                description: 'Assign a custom like key for reels: ',
+                description: 'Custom reel like keybind (empty for disabled): ',
                 category: 'preferences',
                 default: '',
                 type: 'text'
