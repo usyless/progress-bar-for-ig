@@ -31,7 +31,7 @@
     &:hover, &:has(.usy-progress-bar.usy-holding) {
         background: linear-gradient(to bottom, transparent, #00000066);
 
-        &::after, &::before {
+        &::after {
             opacity: 1;
         }
     }
@@ -40,7 +40,7 @@
         opacity: 0;
     }
 
-    &::after, &::before {
+    &::after {
         pointer-events: none;
         user-select: none;
         content: var(--time, "0:00/0:00");
@@ -56,19 +56,8 @@
         transition: 0.2s;
     }
 
-    &::before {
-        color: transparent;
-        background-color: #000000aa;
-        border: 5px solid #000000aa;
-        border-radius: 9px;
-        filter: blur(10px);
-        bottom: 23px;
-    }
-
-    &.no-progress {
-        &::before, &::after {
-            display: none !important;
-        }
+    &.no-progress::after {
+        display: none !important;
     }
 
     .usy-progress-bar {

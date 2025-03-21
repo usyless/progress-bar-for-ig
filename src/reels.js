@@ -5,8 +5,9 @@
         preferences: {
             show_bar: true,
             show_progress: true,
-            video_start_at_beginning_fix: false,
-            share_button_bug_fix: false
+            share_button_bug_fix: true,
+            prevent_extra_menus: false,
+            custom_like_key: ''
         },
 
         loadSettings: () => new Promise(resolve => {
@@ -108,7 +109,7 @@
         },
 
         fixShareButtonBug: (reel) => {
-            const shareButton = reel.closest('div.x78zum5.xedcshv').nextElementSibling;
+            const shareButton = reel.closest('div.x78zum5.xedcshv')?.nextElementSibling;
             if (shareButton) {
                 let scroll;
                 shareButton.addEventListener('pointerdown', () => {
@@ -128,14 +129,26 @@
             }
         },
 
+        preventExtraMenus: (reel) => {
+            reel.closest('div.x78zum5.xedcshv')?.nextElementSibling?.firstElementChild?.lastElementChild?.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+
+                e.currentTarget.parentElement.firstElementChild.click();
+            }, {capture: true});
+        },
+
         addProgressBars: () => {
             for (const reel of document.body.querySelectorAll('video:not([usy-progress-bar])')) {
                 reel.setAttribute('usy-progress-bar', '');
                 Video.addProgressBar(reel);
 
                 // Bug fixes
-                if (Settings.video_start_at_beginning_fix) reel.currentTime = 0;
-                if (onReels && Settings.preferences.share_button_bug_fix) Video.fixShareButtonBug(reel);
+                if (onReels) {
+                    if (Settings.preferences.share_button_bug_fix) Video.fixShareButtonBug(reel);
+                    if (Settings.preferences.prevent_extra_menus) Video.preventExtraMenus(reel);
+                }
             }
         },
 

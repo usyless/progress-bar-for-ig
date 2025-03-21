@@ -13,29 +13,29 @@ if (typeof browser === 'undefined') {
         'Preferences': [
             {
                 name: 'show_bar',
-                description: 'Show faint small progress bar when not hovering',
+                description: 'Show a faint small progress bar when not hovering',
                 category: 'preferences',
                 default: true
             },
             {
                 name: 'show_progress',
-                description: 'Show video progress on progress bar hover',
+                description: 'Show the current video time when hovering over the progress bar',
                 category: 'preferences',
                 default: true
-            }
-        ],
-        'Bug Fixes': [
+            },
             {
-                name: 'video_start_at_beginning_fix',
-                description: 'Try fix bug where videos do not start at the very beginning always',
+                name: 'prevent_extra_menus',
+                description: 'Prevent the "liked by" menu appearing when clicking the likes number on reels',
                 category: 'preferences',
                 default: false
             },
+        ],
+        'Bug Fixes': [
             {
                 name: 'share_button_bug_fix',
-                description: 'Try fix scroll position reset bug with share/like buttons on reels',
+                description: 'Fix the scroll position reset bug with share/like buttons on reels',
                 category: 'preferences',
-                default: false
+                default: true
             }
         ],
         'Extras': [
