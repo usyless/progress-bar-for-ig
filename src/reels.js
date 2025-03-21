@@ -23,6 +23,13 @@
         return `${Math.floor(time / 60).toString()}:${(time % 60).toString().padStart(2, '0')}`;
     };
 
+    const inViewport = (e) => {
+        const rect = e.getBoundingClientRect();
+        return rect.top >= 0 && rect.left >= 0 &&
+            rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+            rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+    }
+
     let onReels = location.pathname.includes('/reels/');
 
     const Video = {
@@ -165,10 +172,10 @@
         }
     };
 
-    window.addEventListener('keypress', (e) => {
+    window.addEventListener('keydown', (e) => {
         if (onReels && e.key.toLowerCase() === Settings.preferences.custom_like_key) {
             for (const reel of document.querySelectorAll('video')) {
-                if (!reel.paused) {
+                if (inViewport(reel)) {
                     Video.likeVideo(reel);
                     break;
                 }
