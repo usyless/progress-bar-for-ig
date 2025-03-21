@@ -173,7 +173,7 @@
     };
 
     window.addEventListener('keydown', (e) => {
-        if (onReels && e.key.toLowerCase() === Settings.preferences.custom_like_key) {
+        if (onReels && e.key.toLowerCase() === Settings.preferences.custom_like_key.toLowerCase()) {
             for (const reel of document.querySelectorAll('video')) {
                 if (inViewport(reel)) {
                     Video.likeVideo(reel);
