@@ -139,6 +139,10 @@
             }, {capture: true});
         },
 
+        likeVideo: (reel) => {
+            reel.closest('div.x78zum5.xedcshv')?.nextElementSibling?.firstElementChild?.click();
+        },
+
         addProgressBars: () => {
             for (const reel of document.body.querySelectorAll('video:not([usy-progress-bar])')) {
                 reel.setAttribute('usy-progress-bar', '');
@@ -159,6 +163,17 @@
             }
         }
     };
+
+    window.addEventListener('keypress', (e) => {
+        if (onReels && e.key === Settings.preferences.custom_like_key) {
+            for (const reel of document.querySelectorAll('video')) {
+                if (!reel.paused) {
+                    Video.likeVideo(reel);
+                    break;
+                }
+            }
+        }
+    }, {capture: true});
 
     {
         Video.ClearAll();

@@ -29,6 +29,13 @@ if (typeof browser === 'undefined') {
                 category: 'preferences',
                 default: false
             },
+            {
+                name: 'custom_like_key',
+                description: 'Assign a custom like key for reels: ',
+                category: 'preferences',
+                default: '',
+                type: 'text'
+            }
         ],
         'Bug Fixes': [
             {
@@ -68,6 +75,16 @@ if (typeof browser === 'undefined') {
             checkbox.setAttribute('type', 'checkbox');
             valuesToUpdate.push({obj: e, func: (v) => checkbox.checked = v});
             checkbox.addEventListener('change', (ev) => update_value(ev, e, 'checked'));
+            return outer;
+        },
+        text: (e) => {
+            const [outer, input] = get_generic_setting(e, 'input', true);
+            input.setAttribute('type', 'text');
+            valuesToUpdate.push({obj: e, func: (v) => input.value = v});
+            input.addEventListener('input', (ev) => {
+                input.value = input.value.slice(-1);
+                update_value(ev, e, 'value');
+            });
             return outer;
         }
     }
