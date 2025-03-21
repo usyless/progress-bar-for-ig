@@ -78,7 +78,7 @@ if (typeof browser === 'undefined') {
             return outer;
         },
         text: (e) => {
-            const [outer, input] = get_generic_setting(e, 'input', true);
+            const [outer, input] = get_generic_setting(e, 'input');
             input.setAttribute('type', 'text');
             valuesToUpdate.push({obj: e, func: (v) => input.value = v});
             input.addEventListener('input', (ev) => {
