@@ -1,4 +1,4 @@
-<h1 align="center"><img src="https://github.com/usyless/progress-bar-for-ig/blob/main/src/icons/icon.svg?raw=true" width="160" height="160" alt="logo"><br>Progress bar for Instagram</h1>
+<h1 align="center"><a href="#"><img src="https://github.com/usyless/progress-bar-for-ig/blob/main/src/icons/icon.svg?raw=true" width="160" height="160" alt="logo"></a><br>Progress bar for Instagram</h1>
 
 Adds progress bars to all videos on Instagram
 
