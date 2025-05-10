@@ -5,7 +5,6 @@
         preferences: {
             show_bar: true,
             show_progress: true,
-            share_button_bug_fix: true,
             prevent_extra_menus: false,
             custom_like_key: ''
         },
@@ -117,27 +116,6 @@
 
         getClosestReelContainer: (e) => e.closest('div.x78zum5.xedcshv'),
 
-        fixShareButtonBug: (reel) => {
-            const shareButton = Video.getClosestReelContainer(reel)?.nextElementSibling;
-            if (shareButton) {
-                let scroll;
-                shareButton.addEventListener('pointerdown', () => {
-                    scroll = document.querySelector('main').firstElementChild.scrollTop;
-                }, {capture: true});
-                shareButton.addEventListener('click', () => {
-                    document.querySelector('main').firstElementChild.scrollTop = scroll;
-                    setTimeout(() => {
-                        document.querySelector('main').firstElementChild.scrollTop = scroll;
-                        document.querySelector('div.x1n2onr6.xzkaem6')?.addEventListener('click', (e) => {
-                            setTimeout(() => {
-                                document.querySelector('main').firstElementChild.scrollTop = scroll;
-                            }, 100);
-                        }, {capture: true});
-                    }, 100);
-                });
-            }
-        },
-
         preventExtraMenus: (reel) => {
             Video.getClosestReelContainer(reel)?.nextElementSibling?.firstElementChild?.lastElementChild?.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -158,7 +136,6 @@
                 Video.addProgressBar(reel);
 
                 if (onReels) {
-                    if (Settings.preferences.share_button_bug_fix) Video.fixShareButtonBug(reel);
                     if (Settings.preferences.prevent_extra_menus) Video.preventExtraMenus(reel);
                 }
             }

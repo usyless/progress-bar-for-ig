@@ -37,14 +37,6 @@ if (typeof browser === 'undefined') {
                 type: 'text'
             }
         ],
-        'Bug Fixes': [
-            {
-                name: 'share_button_bug_fix',
-                description: 'Fix the scroll position reset bug with share/like buttons on reels',
-                category: 'preferences',
-                default: true
-            }
-        ],
         'Extras': [
             {
                 name: 'reset_all_settings',
