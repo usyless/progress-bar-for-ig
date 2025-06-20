@@ -99,3 +99,43 @@
         }
     }
 }
+
+.usy-volume-bar-button {
+    overflow-x: visible;
+    overflow-y: visible;
+
+    .usy-volume-bar-container {
+        --usyWidth: 100px;
+        --usyHeight: 5px;
+        --right-space: 10px;
+        --click-margin: 10px;
+
+        position: absolute;
+        left: calc(-1 * var(--usyWidth) - var(--right-space));
+        width: var(--usyWidth);
+        height: calc(var(--usyHeight) + var(--click-margin));
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+
+        .usy-volume-bar {
+            opacity: 0;
+            transition: opacity 0.2s;
+            position: relative;
+            left: 0;
+            width: var(--usyWidth);
+            height: var(--usyHeight);
+            background: white;
+            box-shadow: 0 0 5px black;
+            border-radius: 3px;
+            border: solid 0 transparent;
+        }
+    }
+
+    .usy-volume-bar-container:hover .usy-volume-bar,
+    &:hover .usy-volume-bar {
+        opacity: 1;
+    }
+}

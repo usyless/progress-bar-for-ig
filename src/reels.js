@@ -114,6 +114,27 @@
             });
         },
 
+        addVolumeBar: (reel) => {
+            const mute_button = reel.parentElement.querySelector('[aria-label^="Audio is "]')?.parentElement;
+            if (mute_button) {
+                mute_button.classList.add('usy-volume-bar-button');
+
+                const volumeBarContainer = document.createElement('div');
+                volumeBarContainer.classList.add('usy-volume-bar-container');
+                const volumeBar = document.createElement('div');
+                volumeBar.classList.add('usy-volume-bar');
+                volumeBarContainer.appendChild(volumeBar);
+
+                volumeBarContainer.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+                })
+
+                mute_button.prepend(volumeBarContainer);
+            }
+        },
+
         getClosestReelContainer: (e) => e.closest('div.x78zum5.xedcshv'),
 
         preventExtraMenus: (reel) => {
@@ -134,6 +155,7 @@
             for (const reel of document.body.querySelectorAll('video:not([usy-progress-bar])')) {
                 reel.setAttribute('usy-progress-bar', '');
                 Video.addProgressBar(reel);
+                Video.addVolumeBar(reel);
 
                 if (onReels) {
                     if (Settings.preferences.prevent_extra_menus) Video.preventExtraMenus(reel);
