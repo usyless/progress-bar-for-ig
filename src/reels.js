@@ -1,6 +1,10 @@
 'use strict';
 
 (() => {
+    if (typeof this.browser === 'undefined') {
+        this.browser = /** @suppress */ chrome;
+    }
+
     const Settings = {
         preferences: {
             show_bar: true,
@@ -9,13 +13,44 @@
             custom_like_key: ''
         },
 
-        loadSettings: () => new Promise(resolve => {
-            chrome.storage.local.get(['preferences'], (s) => {
-                for (const setting of ['preferences']) Settings[setting] = {...Settings[setting], ...s[setting]};
-                resolve();
-            });
-        }),
+        _video_status_data: {
+            volume: 1.0,
+            muted: true
+        },
+
+        loadSettings: async () => {
+            const s = await browser.storage.local.get(['preferences', 'video_status']);
+            for (const setting of ['preferences', ['video_status', '_video_status_data']]) {
+                if (Array.isArray(setting)) {
+                    Settings[setting[1]] = {...Settings[setting[1]], ...s[setting[0]]};
+                } else {
+                    Settings[setting] = {...Settings[setting], ...s[setting]};
+                }
+            }
+        },
+
+        onVideoStatusChange: () => browser.storage.local.set(Settings.video_status),
+
+        get video_status() {
+            return this._video_status_proxy;
+        },
+
+        set video_status(newData) {
+            Object.assign(this._video_status_data, newData);
+            Settings.onVideoStatusChange();
+        },
+
+        _video_status_handler: {
+            set(target, prop, value) {
+                target[prop] = value;
+                Settings.onVideoStatusChange();
+                return true;
+            }
+        },
+
+        _video_status_proxy: null,
     };
+    Settings._video_status_proxy = new Proxy(Settings._video_status_data, Settings._video_status_handler);
 
     const formatTime = (time) => {
         time = parseInt(time);
@@ -32,6 +67,7 @@
     let onReels = location.pathname.includes('/reels/');
 
     const Video = {
+        /** @param {HTMLVideoElement} reel */
         addProgressBar: (reel) => {
             let holding = false, duration;
 
@@ -83,7 +119,8 @@
                 if (!holding) bar.classList.remove('usy-holding');
             }
 
-            let pauseTimeout = null, paused = false;
+            let pauseTimeout = null;
+            let paused = false;
             const pauseReel = reel.pause.bind(reel);
             const moveListener = (e) => {
                 e.preventDefault();
@@ -114,9 +151,20 @@
             });
         },
 
+        updateAllVideoVolume: (volume) => {
+            volume ??= Settings.video_status.volume;
+            for (const video of document.querySelectorAll('video')) {
+                video.volume = volume;
+                // instagram already handles mute sync
+            }
+        },
+
+        /** @param {HTMLVideoElement} reel */
         addVolumeBar: (reel) => {
             const mute_button = reel.parentElement.querySelector('[aria-label^="Audio is "]')?.parentElement;
             if (mute_button) {
+                reel.volume = Settings.video_status.volume;
+
                 mute_button.classList.add('usy-volume-bar-button');
 
                 const volumeBarContainer = document.createElement('div');
@@ -125,11 +173,47 @@
                 volumeBar.classList.add('usy-volume-bar');
                 volumeBarContainer.appendChild(volumeBar);
 
+                const updateVolume = (e) => {
+                    const box = volumeBarContainer.getBoundingClientRect();
+                    reel.volume = Math.max(0, Math.min((e.clientX - box.left) / box.width, 1.0));
+                }
+
+                const moveListener = (e) => {
+                    e.preventDefault();
+                    updateVolume(e);
+                }
+                const stopHold = (e) => {
+                    e.preventDefault();
+                    document.removeEventListener('pointermove', moveListener);
+                    updateVolume(e);
+                    volumeBar.classList.remove('usy-holding');
+
+                    Settings.video_status.volume = reel.volume;
+                    Settings.video_status.muted = reel.muted;
+                    Video.updateAllVideoVolume(reel.volume);
+                }
+
                 volumeBarContainer.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
                     e.stopImmediatePropagation();
-                })
+                });
+
+                volumeBarContainer.addEventListener('pointerdown', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+
+                    volumeBar.classList.add('usy-holding');
+                    document.addEventListener('pointermove', moveListener);
+                    document.addEventListener('pointerup', stopHold, {once: true});
+                    updateVolume(e);
+                });
+
+                reel.addEventListener('volumechange', () => {
+                    // wont react to external changes
+                    volumeBar.style.width = `${reel.volume * 100}%`;
+                });
 
                 mute_button.prepend(volumeBarContainer);
             }
@@ -165,8 +249,10 @@
 
         ClearAll: async () => {
             for (const reel of document.body.querySelectorAll('video[usy-progress-bar]')) {
-                reel.parentElement.querySelector('div.usy-progress-bar-container')?.remove();
                 reel.removeAttribute('usy-progress-bar');
+            }
+            for (const element of document.body.querySelectorAll('.usy-volume-bar-container, .usy-progress-bar-container')) {
+                element.remove();
             }
         }
     };
@@ -196,7 +282,13 @@
         });
     }
 
-    chrome.storage.onChanged.addListener(async (_, namespace) => {
-        if (namespace === 'local') Settings.loadSettings().then(Video.ClearAll).then(Video.addProgressBars);
+    browser.storage.onChanged.addListener(async (changes, namespace) => {
+        if (namespace === 'local') {
+            if (changes.hasOwnProperty('video_status')) {
+                Video.updateAllVideoVolume();
+            } else {
+                Settings.loadSettings().then(Video.ClearAll).then(Video.addProgressBars);
+            }
+        }
     });
 })();

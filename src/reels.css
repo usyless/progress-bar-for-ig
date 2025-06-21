@@ -123,7 +123,7 @@
         .usy-volume-bar {
             opacity: 0;
             transition: opacity 0.2s;
-            position: relative;
+            position: absolute;
             left: 0;
             width: var(--usyWidth);
             height: var(--usyHeight);
@@ -135,7 +135,7 @@
     }
 
     .usy-volume-bar-container:hover .usy-volume-bar,
-    &:hover .usy-volume-bar {
+    &:hover .usy-volume-bar, .usy-volume-bar.usy-holding {
         opacity: 1;
     }
 }
