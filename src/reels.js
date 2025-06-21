@@ -27,9 +27,10 @@
                     Settings[setting] = {...Settings[setting], ...s[setting]};
                 }
             }
+            Settings._video_status_proxy = new Proxy(Settings._video_status_data, Settings._video_status_handler);
         },
 
-        onVideoStatusChange: () => browser.storage.local.set(Settings.video_status),
+        onVideoStatusChange: () => browser.storage.local.set({video_status: Settings._video_status_data}),
 
         get video_status() {
             return this._video_status_proxy;
@@ -50,7 +51,6 @@
 
         _video_status_proxy: null,
     };
-    Settings._video_status_proxy = new Proxy(Settings._video_status_data, Settings._video_status_handler);
 
     const formatTime = (time) => {
         time = parseInt(time);
@@ -188,9 +188,9 @@
                     updateVolume(e);
                     volumeBar.classList.remove('usy-holding');
 
-                    Settings.video_status.volume = reel.volume;
-                    Settings.video_status.muted = reel.muted;
-                    Video.updateAllVideoVolume(reel.volume);
+                    Settings.video_status = {
+                        volume: reel.volume, muted: reel.muted
+                    }
                 }
 
                 volumeBarContainer.addEventListener('click', (e) => {
@@ -271,13 +271,15 @@
     {
         Video.ClearAll().then(() => {
             const observerSettings = {subtree: true, childList: true};
+            const cb = (_, o) => {
+                o?.disconnect();
+                onReels = location.pathname.includes('/reels/');
+                Video.addProgressBars();
+                o?.observe(document.body, observerSettings);
+            }
             Settings.loadSettings().then(() => {
-                (new MutationObserver((_, o) => {
-                    o.disconnect();
-                    onReels = location.pathname.includes('/reels/');
-                    Video.addProgressBars();
-                    o.observe(document.body, observerSettings);
-                })).observe(document.body, observerSettings);
+                cb();
+                (new MutationObserver(cb)).observe(document.body, observerSettings);
             });
         });
     }
