@@ -101,8 +101,8 @@
 }
 
 .usy-volume-bar-button {
-    overflow-x: visible;
-    overflow-y: visible;
+    overflow-x: visible !important;
+    overflow-y: visible !important;
 
     .usy-volume-bar-container {
         --usyWidth: 100px;
