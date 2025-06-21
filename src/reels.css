@@ -108,7 +108,7 @@
         --usyWidth: 100px;
         --usyHeight: 5px;
         --right-space: 10px;
-        --click-margin: 15px;
+        --click-margin: 10px;
 
         position: absolute;
         left: calc(-1 * var(--usyWidth) - var(--right-space));
