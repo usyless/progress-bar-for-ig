@@ -163,8 +163,6 @@
         addVolumeBar: (reel) => {
             const mute_button = reel.parentElement.querySelector('[aria-label^="Audio is "]')?.parentElement;
             if (mute_button) {
-                reel.volume = Settings.video_status.volume;
-
                 mute_button.classList.add('usy-volume-bar-button');
 
                 const volumeBarContainer = document.createElement('div');
@@ -185,7 +183,6 @@
                 const stopHold = (e) => {
                     e.preventDefault();
                     document.removeEventListener('pointermove', moveListener);
-                    updateVolume(e);
                     volumeBar.classList.remove('usy-holding');
 
                     Settings.video_status = {
@@ -214,6 +211,10 @@
                     // wont react to external changes
                     volumeBar.style.width = `${reel.volume * 100}%`;
                 });
+
+                setTimeout(() => {
+                    reel.volume = Settings.video_status.volume;
+                }, 0);
 
                 mute_button.prepend(volumeBarContainer);
             }
