@@ -163,6 +163,8 @@
         addVolumeBar: (reel) => {
             const mute_button = reel.parentElement.querySelector('[aria-label^="Audio is "]')?.parentElement;
             if (mute_button) {
+                const toggle = mute_button.closest('[aria-label="Toggle audio"]');
+
                 mute_button.classList.add('usy-volume-bar-button');
 
                 const volumeBarContainer = document.createElement('div');
@@ -212,8 +214,18 @@
                     volumeBar.style.width = `${reel.volume * 100}%`;
                 });
 
+                toggle?.addEventListener('click', () => {
+                    setTimeout(() => {
+                        Settings.video_status.muted = reel.muted;
+                    }, 0);
+                });
+
                 setTimeout(() => {
                     reel.volume = Settings.video_status.volume;
+
+                    if (reel.muted !== Settings.video_status.muted) {
+                        mute_button.click();
+                    }
                 }, 0);
 
                 mute_button.prepend(volumeBarContainer);
