@@ -108,7 +108,7 @@
         --usyWidth: 100px;
         --usyHeight: 5px;
         --right-space: 10px;
-        --click-margin: 10px;
+        --click-margin: 15px;
 
         position: absolute;
         left: calc(-1 * var(--usyWidth) - var(--right-space));
@@ -120,7 +120,7 @@
         justify-content: center;
         flex-direction: column;
 
-        .usy-volume-bar {
+        .usy-volume-bar, .usy-volume-bar::before {
             opacity: 0;
             transition: opacity 0.2s;
             position: absolute;
@@ -132,10 +132,18 @@
             border-radius: 3px;
             border: solid 0 transparent;
         }
+
+        .usy-volume-bar::before {
+            content: "";
+        }
     }
 
     .usy-volume-bar-container:hover .usy-volume-bar,
     &:hover .usy-volume-bar, .usy-volume-bar.usy-holding {
         opacity: 1;
+
+        &::before {
+            opacity: 0.2;
+        }
     }
 }
