@@ -15,7 +15,6 @@
 
         _video_status_data: {
             volume: 1.0,
-            muted: true
         },
 
         loadSettings: async () => {
@@ -163,8 +162,6 @@
         addVolumeBar: (reel) => {
             const mute_button = reel.parentElement.querySelector('[aria-label^="Audio is "]')?.parentElement;
             if (mute_button) {
-                const toggle = mute_button.closest('[aria-label="Toggle audio"]');
-
                 mute_button.classList.add('usy-volume-bar-button');
 
                 const volumeBarContainer = document.createElement('div');
@@ -187,9 +184,7 @@
                     document.removeEventListener('pointermove', moveListener);
                     volumeBar.classList.remove('usy-holding');
 
-                    Settings.video_status = {
-                        volume: reel.volume, muted: reel.muted
-                    }
+                    Settings.video_status.volume = reel.volume;
                 }
 
                 volumeBarContainer.addEventListener('click', (e) => {
@@ -214,18 +209,8 @@
                     volumeBar.style.width = `${reel.volume * 100}%`;
                 });
 
-                toggle?.addEventListener('click', () => {
-                    setTimeout(() => {
-                        Settings.video_status.muted = reel.muted;
-                    }, 0);
-                });
-
                 setTimeout(() => {
                     reel.volume = Settings.video_status.volume;
-
-                    if (reel.muted !== Settings.video_status.muted) {
-                        mute_button.click();
-                    }
                 }, 0);
 
                 mute_button.prepend(volumeBarContainer);
