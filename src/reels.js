@@ -1,9 +1,10 @@
-'use strict';
-
 (() => {
-    if (typeof this.browser === 'undefined') {
-        this.browser = /** @suppress */ chrome;
-    }
+    'use strict';
+    // set browser to chrome if not in firefox
+    /** @type {typeof browser} */
+    const extension = typeof browser !== 'undefined' ? browser : (() => {
+        return chrome;
+    })();
 
     const Settings = {
         preferences: {
@@ -18,7 +19,7 @@
         },
 
         loadSettings: async () => {
-            const s = await browser.storage.local.get(['preferences', 'video_status']);
+            const s = await extension.storage.local.get(['preferences', 'video_status']);
             for (const setting of ['preferences', ['video_status', '_video_status_data']]) {
                 if (Array.isArray(setting)) {
                     Settings[setting[1]] = {...Settings[setting[1]], ...s[setting[0]]};
@@ -29,7 +30,7 @@
             Settings._video_status_proxy = new Proxy(Settings._video_status_data, Settings._video_status_handler);
         },
 
-        onVideoStatusChange: () => browser.storage.local.set({video_status: Settings._video_status_data}),
+        onVideoStatusChange: () => extension.storage.local.set({video_status: Settings._video_status_data}),
 
         get video_status() {
             return this._video_status_proxy;
