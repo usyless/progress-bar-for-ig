@@ -161,7 +161,9 @@
 
         /** @param {HTMLVideoElement} reel */
         addVolumeBar: (reel) => {
-            const mute_button = reel.parentElement.querySelector('[aria-label^="Audio is "]')?.parentElement;
+            const mute_button =
+                reel.parentElement.querySelector('[aria-label^="Audio is "]')?.parentElement
+                ?? reel.closest('div:not([class]):not([style])')?.parentElement?.querySelector('[aria-label^="Audio is "]')?.parentElement;
             if (mute_button) {
                 mute_button.classList.add('usy-volume-bar-button');
 
@@ -213,6 +215,11 @@
                 setTimeout(() => {
                     reel.volume = Settings.video_status.volume;
                 }, 0);
+
+                if (location.pathname.includes('/stories/')) {
+                    volumeBarContainer.style.left = 'auto';
+                    volumeBarContainer.style.right = `calc(var(--usyWidth) + var(--right-space) + ${mute_button.clientWidth}px)`
+                }
 
                 mute_button.prepend(volumeBarContainer);
             }
