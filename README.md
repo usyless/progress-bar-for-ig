@@ -6,7 +6,7 @@ Adds progress and volume bars to all videos on Instagram
 
 # Installation
 
-- **Firefox Desktop/Mobile (or Fennec)**
-	- Install extension through the [Mozilla addons page](https://addons.mozilla.org/en-GB/firefox/addon/progress-bar-for-ig/)
-- **Chrome or other chromium based browsers**
-    - Install extension through the [Chrome web store](https://chromewebstore.google.com/detail/progress-bar-for-instagra/nnbldnlogdimmmecdlliedjkfnfepgom)
+<a href="https://addons.mozilla.org/en-GB/firefox/addon/progress-bar-for-ig/"><img src="https://github.com/usyless/progress-bar-for-ig/blob/main/assets/3rdparty/firefox-addons.webp?raw=true" alt="Firefox Addons Link"></a>
+
+
+<a href="https://chromewebstore.google.com/detail/progress-bar-for-instagra/nnbldnlogdimmmecdlliedjkfnfepgom"><img src="https://github.com/usyless/progress-bar-for-ig/blob/main/assets/3rdparty/chrome-web-store.png?raw=true" alt="Chrome Web Store Link"></a>
