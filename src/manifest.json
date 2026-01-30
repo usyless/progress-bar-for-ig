@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "Progress Bar for Instagram",
-    "version": "1.2.1",
+    "version": "0.0.0.1",
     "author": "usy",
     "homepage_url": "https://github.com/usyless/progress-bar-for-ig",
     "description": "Adds progress bars and volume bars to videos on Instagram",
@@ -19,6 +19,7 @@
     },
     "browser_specific_settings": {
       "gecko": {
+        "id": "progress-bar-for-ig@usyless.uk",
         "data_collection_permissions": {
           "required": ["none"]
         }

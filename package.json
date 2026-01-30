@@ -1,0 +1,34 @@
+{
+  "name": "progress-bar-for-ig",
+  "version": "1.2.1",
+  "description": "Adds progress bars to videos on Instagram",
+  "homepage": "https://github.com/usyless/progress-bar-for-ig#readme",
+  "bugs": {
+    "url": "https://github.com/usyless/progress-bar-for-ig/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/usyless/progress-bar-for-ig.git"
+  },
+  "license": "GPL-3.0",
+  "author": "usy",
+  "type": "module",
+  "scripts": {
+    "build": "usy-extension-builder-build",
+    "swap-manifests": "usy-extension-builder-swap-manifests"
+  },
+  "devDependencies": {
+    "@types/firefox-webext-browser": "^143.0.0",
+    "usy-extension-builder": "github:/usyless/usy-extension-builder.git#main"
+  },
+  "extensionManifestConfig": {
+    "firefox": {
+      "replaceAll": [
+        {
+          "from": "progress-bar-for-ig@usyless.uk",
+          "to": "{b227d136-05cd-447f-a0d2-81f2c3cd7547}"
+        }
+      ]
+    }
+  }
+}
