@@ -218,7 +218,8 @@
 
                 if (location.pathname.includes('/stories/')) {
                     volumeBarContainer.style.left = 'auto';
-                    volumeBarContainer.style.right = `calc((var(--right-space) * 2) + ${mute_button.clientWidth}px)`;
+                    volumeBarContainer.style.right = `calc(var(--usyWidth) + var(--right-space) + ${mute_button.clientWidth}px)`;
+                    // volumeBarContainer.style.right = `calc((var(--right-space) * 2) + ${mute_button.clientWidth}px)`;
                 }
 
                 mute_button.prepend(volumeBarContainer);
