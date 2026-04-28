@@ -93,6 +93,7 @@
             reel.after(barBoxContainer);
 
             const init = () => {
+                reel.volume = Settings.video_status.volume;
                 if (duration) {
                     barBoxContainer.style.setProperty('--time', `"${formatTime(reel.currentTime)}/${formatTime(duration)}"`);
                     if (!holding && !reel.paused) {
@@ -167,88 +168,73 @@
             };
         },
 
-        updateAllVideoVolume: (volume) => {
-            volume ??= Settings.video_status.volume;
-            for (const video of document.querySelectorAll('video')) {
-                video.volume = volume;
-                // instagram already handles mute sync
-            }
-        },
-
         fixProgressBars: () => {
             for (const bar of document.querySelectorAll('.usy-progress-bar-container')) {
                 bar.__fix_progress_bar?.();
             }
         },
 
-        /**
-         * @param {HTMLElement} elem
-         * @returns {HTMLElement | null}
-         */
-        findClosestReel: (elem) => {
-            let reel;
-            while (elem && !reel) {
-                reel = elem.querySelector('video');
-                elem = elem.parentElement;
-            }
-            return reel;
-        },
-
         /** @param {HTMLElement} mute_button */
         addVolumeBar: (mute_button) => {
-            /** @type {HTMLVideoElement | null} */
-            const reel = Video.findClosestReel(mute_button);
+            for (const c of mute_button.parentElement.querySelectorAll('.usy-volume-bar-container')) c.remove();
+            mute_button.classList.add('usy-volume-bar-button');
 
-            if (reel) {
-                for (const c of mute_button.parentElement.querySelectorAll('.usy-volume-bar-container')) c.remove();
-                mute_button.classList.add('usy-volume-bar-button');
+            const volumeBarContainer = document.createElement('div');
+            volumeBarContainer.classList.add('usy-volume-bar-container');
+            const volumeBar = document.createElement('div');
+            volumeBar.classList.add('usy-volume-bar');
+            volumeBarContainer.appendChild(volumeBar);
+            volumeBar.style.width = `${Settings.video_status.volume * 100}%`;
 
-                const volumeBarContainer = document.createElement('div');
-                volumeBarContainer.classList.add('usy-volume-bar-container');
-                const volumeBar = document.createElement('div');
-                volumeBar.classList.add('usy-volume-bar');
-                volumeBarContainer.appendChild(volumeBar);
-
-                const updateVolume = (e) => {
-                    const box = volumeBarContainer.getBoundingClientRect();
-                    reel.volume = Math.max(0, Math.min((e.clientX - box.left) / box.width, 1.0));
-                }
-
-                const moveListener = (e) => {
-                    e.preventDefault();
-                    updateVolume(e);
-                }
-                const stopHold = (e) => {
-                    e.preventDefault();
-                    document.removeEventListener('pointermove', moveListener);
-                    volumeBar.classList.remove('usy-holding');
-
-                    Settings.video_status.volume = reel.volume;
-                }
-
-                volumeBarContainer.addEventListener('click', preventAll);
-
-                volumeBarContainer.addEventListener('pointerdown', (e) => {
-                    preventAll(e);
-
-                    volumeBar.classList.add('usy-holding');
-                    document.addEventListener('pointermove', moveListener);
-                    document.addEventListener('pointerup', stopHold, {once: true});
-                    updateVolume(e);
-                });
-
-                reel.addEventListener('volumechange', () => {
-                    // wont react to external changes
-                    volumeBar.style.width = `${reel.volume * 100}%`;
-                });
-
-                setTimeout(() => {
-                    reel.volume = Settings.video_status.volume;
-                }, 0);
-
-                mute_button.prepend(volumeBarContainer);
+            const updateVolume = (e) => {
+                const {left, width} = volumeBarContainer.getBoundingClientRect();
+                const volume = Math.max(0, Math.min((e.clientX - left) / width, 1.0));
+                Video.updateGlobalVolume(volume);
             }
+
+            const moveListener = (e) => {
+                e.preventDefault();
+                updateVolume(e);
+            }
+            const stopHold = (e) => {
+                e.preventDefault();
+                document.removeEventListener('pointermove', moveListener);
+                volumeBar.classList.remove('usy-holding');
+
+                Settings.video_status.volume = document.querySelector('video').volume;
+            }
+
+            volumeBarContainer.addEventListener('click', preventAll);
+
+            volumeBarContainer.addEventListener('pointerdown', (e) => {
+                preventAll(e);
+
+                volumeBar.classList.add('usy-holding');
+                document.addEventListener('pointermove', moveListener);
+                document.addEventListener('pointerup', stopHold, {once: true});
+                updateVolume(e);
+            });
+
+            mute_button.prepend(volumeBarContainer);
         },
+
+        /**
+         * @type {(volume: Number) => void}
+         */
+        updateGlobalVolume: (() => {
+            let volumeTimer;
+            return (volume) => {
+                clearTimeout(volumeTimer);
+                for (const video of document.querySelectorAll('video')) video.volume = volume;
+                const volume_attr = `${volume * 100}%`;
+                for (const bar of document.querySelectorAll('.usy-volume-bar')) bar.style.width = volume_attr;
+                if (Settings.video_status.volume !== volume) {
+                    volumeTimer = setTimeout(() => {
+                        Settings.video_status.volume = volume;
+                    }, 100);
+                }
+            };
+        })(),
 
         /**
          * @param {HTMLElement} e
@@ -338,12 +324,8 @@
     }
 
     browser.storage.onChanged.addListener(async (changes, namespace) => {
-        if (namespace === 'local') {
-            if (changes.hasOwnProperty('video_status')) {
-                Video.updateAllVideoVolume();
-            } else {
-                Settings.loadSettings().then(Video.ClearAll).then(Video.addProgressBars);
-            }
+        if (namespace === 'local' && Object.hasOwn(changes, 'preferences')) {
+            Settings.loadSettings().then(Video.ClearAll).then(Video.addProgressBars);
         }
     });
 })();
