@@ -66,6 +66,15 @@
 
     let onReels = location.pathname.includes('/reels/');
 
+    /**
+     * @param {Event} e
+     */
+    const preventAll = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+    };
+
     const Video = {
         /** @param {HTMLVideoElement} reel */
         addProgressBar: (reel) => {
@@ -123,15 +132,11 @@
             let paused = false;
             const pauseReel = reel.pause.bind(reel);
             const moveListener = (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                e.stopImmediatePropagation();
+                preventAll(e);
                 updateBarFromMouse(e);
             }
             const stopHold = (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                e.stopImmediatePropagation();
+                preventAll(e);
                 clearTimeout(pauseTimeout);
                 document.removeEventListener('pointermove', moveListener);
                 if (!paused) {
@@ -142,9 +147,7 @@
                 updateBarFromMouse(e);
             }
             barBoxContainer.addEventListener('pointerdown', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                e.stopImmediatePropagation();
+                preventAll(e);
                 document.removeEventListener('pointermove', moveListener);
                 document.removeEventListener('pointerup', stopHold);
                 paused = reel.paused;
@@ -155,11 +158,7 @@
                 document.addEventListener('pointerup', stopHold, {once: true});
                 document.addEventListener('pointermove', moveListener);
             });
-            barBoxContainer.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                e.stopImmediatePropagation();
-            });
+            barBoxContainer.addEventListener('click', preventAll);
         },
 
         updateAllVideoVolume: (volume) => {
@@ -201,16 +200,10 @@
                     Settings.video_status.volume = reel.volume;
                 }
 
-                volumeBarContainer.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    e.stopImmediatePropagation();
-                });
+                volumeBarContainer.addEventListener('click', preventAll);
 
                 volumeBarContainer.addEventListener('pointerdown', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    e.stopImmediatePropagation();
+                    preventAll(e);
 
                     volumeBar.classList.add('usy-holding');
                     document.addEventListener('pointermove', moveListener);
@@ -239,18 +232,22 @@
 
         getClosestReelContainer: (e) => e.closest('div.x78zum5.xedcshv'),
 
-        preventExtraMenus: (reel) => {
-            Video.getClosestReelContainer(reel)?.nextElementSibling?.firstElementChild?.lastElementChild?.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                e.stopImmediatePropagation();
+        preventExtraMenus: (() => {
+            /**
+             * @param {MouseEvent} e
+             */
+            const cb = (e) => {
+                preventAll(e);
 
                 e.currentTarget.parentElement.firstElementChild.firstElementChild.firstElementChild.click();
-            }, {capture: true});
-        },
+            };
+            return (reel) => {
+                Video.getClosestReelContainer(reel)?.nextElementSibling?.firstElementChild?.lastElementChild?.addEventListener?.('click', cb, {capture: true});
+            }
+        })(),
 
         likeVideo: (reel) => {
-            Video.getClosestReelContainer(reel)?.nextElementSibling?.firstElementChild?.firstElementChild?.firstElementChild?.firstElementChild?.click();
+            Video.getClosestReelContainer(reel)?.nextElementSibling?.firstElementChild?.firstElementChild?.firstElementChild?.firstElementChild?.click?.();
         },
 
         addProgressBars: () => {
