@@ -181,13 +181,26 @@
             }
         },
 
-        /** @param {HTMLVideoElement} reel */
-        addVolumeBar: (reel) => {
-            const mute_button =
-                reel.parentElement.querySelector('[aria-label^="Audio is "]')?.parentElement
-                ?? reel.closest('div:not([class]):not([style])')?.parentElement?.querySelector('[aria-label^="Audio is "]')?.parentElement;
-            if (mute_button) {
-                for (const c of mute_button.querySelectorAll('.usy-volume-bar-container')) c.remove();
+        /**
+         * @param {HTMLElement} elem
+         * @returns {HTMLElement | null}
+         */
+        findClosestReel: (elem) => {
+            let reel;
+            while (elem && !reel) {
+                reel = elem.querySelector('video');
+                elem = elem.parentElement;
+            }
+            return reel;
+        },
+
+        /** @param {HTMLElement} mute_button */
+        addVolumeBar: (mute_button) => {
+            /** @type {HTMLVideoElement | null} */
+            const reel = Video.findClosestReel(mute_button);
+
+            if (reel) {
+                for (const c of mute_button.parentElement.querySelectorAll('.usy-volume-bar-container')) c.remove();
                 mute_button.classList.add('usy-volume-bar-button');
 
                 const volumeBarContainer = document.createElement('div');
@@ -268,17 +281,24 @@
             for (const reel of document.body.querySelectorAll('video:not([usy-progress-bar])')) {
                 reel.setAttribute('usy-progress-bar', '');
                 Video.addProgressBar(reel);
-                Video.addVolumeBar(reel);
-
-                if (onReels) {
-                    if (Settings.preferences.prevent_extra_menus) Video.preventExtraMenus(reel);
+            }
+            for (const volume of document.body.querySelectorAll('*:has(> [aria-label^="Audio is "]):not([usy-volume-bar])')) {
+                volume.setAttribute('usy-volume-bar', '');
+                Video.addVolumeBar(volume);
+            }
+            if (onReels && Settings.preferences.prevent_extra_menus) {
+                for (const reel of document.body.querySelectorAll('video:not([usy-prevent-extra-menu])')) {
+                    reel.setAttribute('usy-prevent-extra-menu', '');
+                    Video.preventExtraMenus(reel);
                 }
             }
         },
 
         ClearAll: async () => {
-            for (const reel of document.body.querySelectorAll('video[usy-progress-bar]')) {
+            for (const reel of document.body.querySelectorAll('video[usy-progress-bar], *:has(> [aria-label^="Audio is "]):not([usy-volume-bar]), video[usy-prevent-extra-menu]')) {
                 reel.removeAttribute('usy-progress-bar');
+                reel.removeAttribute('usy-volume-bar');
+                reel.removeAttribute('usy-prevent-extra-menu');
             }
             for (const element of document.body.querySelectorAll('.usy-volume-bar-container, .usy-progress-bar-container')) {
                 element.remove();
