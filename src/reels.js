@@ -18,12 +18,14 @@
             volume: 1.0,
         },
 
-        loadSettings: async () => {
-            const s = await extension.storage.local.get(['preferences', 'video_status']);
-            for (const setting of ['preferences', 'video_status']) {
+        loadSettings: async (settings) => {
+            const s = await extension.storage.local.get(settings);
+            for (const setting of settings) {
                 Settings[setting] = {...Settings[setting], ...s[setting]};
             }
         },
+
+        loadAllSettings: () => Settings.loadSettings(['preferences', 'video_status']),
 
         updateVideoStatus: () => extension.storage.local.set({video_status: Settings.video_status}),
     };
@@ -291,7 +293,7 @@
                 Video.addProgressBars();
                 o?.observe(document.body, observerSettings);
             }
-            Settings.loadSettings().then(() => {
+            Settings.loadAllSettings().then(() => {
                 cb();
                 (new MutationObserver(cb)).observe(document.body, observerSettings);
             });
@@ -301,10 +303,12 @@
     browser.storage.onChanged.addListener(async (changes, namespace) => {
         if (namespace === 'local') {
             if (Object.hasOwn(changes, 'preferences')) {
-                Settings.loadSettings().then(Video.ClearAll).then(Video.addProgressBars);
-            } else if (Object.hasOwn(changes, 'video_status')) {
+                Settings.loadSettings(['preferences']).then(Video.ClearAll).then(Video.addProgressBars);
+            }
+
+            if (Object.hasOwn(changes, 'video_status')) {
                 const current_volume = Settings.video_status.volume;
-                Settings.loadSettings().then(() => {
+                Settings.loadSettings(['video_status']).then(() => {
                     if (Settings.video_status.volume !== current_volume) Video.updateGlobalVolume(Settings.video_status.volume);
                 });
             }
