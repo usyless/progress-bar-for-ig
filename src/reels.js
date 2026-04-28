@@ -38,13 +38,13 @@
 
         set video_status(newData) {
             Object.assign(this._video_status_data, newData);
-            Settings.onVideoStatusChange();
+            void Settings.onVideoStatusChange();
         },
 
         _video_status_handler: {
             set(target, prop, value) {
                 target[prop] = value;
-                Settings.onVideoStatusChange();
+                void Settings.onVideoStatusChange();
                 return true;
             }
         },
@@ -131,7 +131,7 @@
                 clearTimeout(pauseTimeout);
                 document.removeEventListener('pointermove', moveListener);
                 if (!paused) {
-                    reel.play();
+                    void reel.play();
                     if (!reel.paused) init();
                 }
                 holding = false;
