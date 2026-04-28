@@ -14,42 +14,18 @@
             custom_like_key: ''
         },
 
-        _video_status_data: {
+        video_status: {
             volume: 1.0,
         },
 
         loadSettings: async () => {
             const s = await extension.storage.local.get(['preferences', 'video_status']);
-            for (const setting of ['preferences', ['video_status', '_video_status_data']]) {
-                if (Array.isArray(setting)) {
-                    Settings[setting[1]] = {...Settings[setting[1]], ...s[setting[0]]};
-                } else {
-                    Settings[setting] = {...Settings[setting], ...s[setting]};
-                }
-            }
-            Settings._video_status_proxy = new Proxy(Settings._video_status_data, Settings._video_status_handler);
-        },
-
-        onVideoStatusChange: () => extension.storage.local.set({video_status: Settings._video_status_data}),
-
-        get video_status() {
-            return this._video_status_proxy;
-        },
-
-        set video_status(newData) {
-            Object.assign(this._video_status_data, newData);
-            void Settings.onVideoStatusChange();
-        },
-
-        _video_status_handler: {
-            set(target, prop, value) {
-                target[prop] = value;
-                void Settings.onVideoStatusChange();
-                return true;
+            for (const setting of ['preferences', 'video_status']) {
+                Settings[setting] = {...Settings[setting], ...s[setting]};
             }
         },
 
-        _video_status_proxy: null,
+        updateVideoStatus: () => extension.storage.local.set({video_status: Settings.video_status}),
     };
 
     const formatTime = (time) => {
@@ -200,8 +176,6 @@
                 e.preventDefault();
                 document.removeEventListener('pointermove', moveListener);
                 volumeBar.classList.remove('usy-holding');
-
-                Settings.video_status.volume = document.querySelector('video').volume;
             }
 
             volumeBarContainer.addEventListener('click', preventAll);
@@ -231,6 +205,7 @@
                 if (Settings.video_status.volume !== volume) {
                     volumeTimer = setTimeout(() => {
                         Settings.video_status.volume = volume;
+                        void Settings.updateVideoStatus();
                     }, 100);
                 }
             };
@@ -324,8 +299,15 @@
     }
 
     browser.storage.onChanged.addListener(async (changes, namespace) => {
-        if (namespace === 'local' && Object.hasOwn(changes, 'preferences')) {
-            Settings.loadSettings().then(Video.ClearAll).then(Video.addProgressBars);
+        if (namespace === 'local') {
+            if (Object.hasOwn(changes, 'preferences')) {
+                Settings.loadSettings().then(Video.ClearAll).then(Video.addProgressBars);
+            } else if (Object.hasOwn(changes, 'video_status')) {
+                const current_volume = Settings.video_status.volume;
+                Settings.loadSettings().then(() => {
+                    if (Settings.video_status.volume !== current_volume) Video.updateGlobalVolume(Settings.video_status.volume);
+                });
+            }
         }
     });
 })();
