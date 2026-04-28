@@ -78,6 +78,7 @@
     const Video = {
         /** @param {HTMLVideoElement} reel */
         addProgressBar: (reel) => {
+            for (const c of reel.parentElement.querySelectorAll('.usy-progress-bar-container')) c.remove();
             let holding = false, duration;
 
             const barBoxContainer = document.createElement('div');
@@ -186,6 +187,7 @@
                 reel.parentElement.querySelector('[aria-label^="Audio is "]')?.parentElement
                 ?? reel.closest('div:not([class]):not([style])')?.parentElement?.querySelector('[aria-label^="Audio is "]')?.parentElement;
             if (mute_button) {
+                for (const c of mute_button.querySelectorAll('.usy-volume-bar-container')) c.remove();
                 mute_button.classList.add('usy-volume-bar-button');
 
                 const volumeBarContainer = document.createElement('div');
@@ -230,12 +232,6 @@
                 setTimeout(() => {
                     reel.volume = Settings.video_status.volume;
                 }, 0);
-
-                if (location.pathname.includes('/stories/')) {
-                    volumeBarContainer.style.left = 'auto';
-                    volumeBarContainer.style.right = `calc(var(--usyWidth) + var(--right-space) + ${mute_button.clientWidth}px)`;
-                    // volumeBarContainer.style.right = `calc((var(--right-space) * 2) + ${mute_button.clientWidth}px)`;
-                }
 
                 mute_button.prepend(volumeBarContainer);
             }
