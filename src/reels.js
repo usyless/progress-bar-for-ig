@@ -206,9 +206,11 @@
             let volumeTimer;
             return (volume) => {
                 clearTimeout(volumeTimer);
-                for (const video of document.querySelectorAll('video')) video.volume = volume;
                 const volume_attr = `${volume * 100}%`;
-                for (const bar of document.querySelectorAll('.usy-volume-bar')) bar.style.width = volume_attr;
+                for (const elem of document.querySelectorAll('video, .usy-volume-bar')) {
+                    if (elem.nodeName === 'VIDEO') elem.volume = volume;
+                    else elem.style.width = volume_attr;
+                }
                 if (Settings.video_status.volume !== volume) {
                     volumeTimer = setTimeout(() => {
                         Settings.video_status.volume = volume;
