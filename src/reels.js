@@ -62,7 +62,7 @@
         return rect.top >= 0 && rect.left >= 0 &&
             rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
             rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-    }
+    };
 
     let onReels = location.pathname.includes('/reels/');
 
@@ -124,10 +124,14 @@
             const pauseReel = reel.pause.bind(reel);
             const moveListener = (e) => {
                 e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
                 updateBarFromMouse(e);
             }
             const stopHold = (e) => {
                 e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
                 clearTimeout(pauseTimeout);
                 document.removeEventListener('pointermove', moveListener);
                 if (!paused) {
@@ -139,6 +143,8 @@
             }
             barBoxContainer.addEventListener('pointerdown', (e) => {
                 e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
                 document.removeEventListener('pointermove', moveListener);
                 document.removeEventListener('pointerup', stopHold);
                 paused = reel.paused;
@@ -148,6 +154,11 @@
                 updateBarFromMouse(e);
                 document.addEventListener('pointerup', stopHold, {once: true});
                 document.addEventListener('pointermove', moveListener);
+            });
+            barBoxContainer.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
             });
         },
 
