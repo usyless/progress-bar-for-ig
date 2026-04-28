@@ -159,6 +159,11 @@
                 document.addEventListener('pointermove', moveListener);
             });
             barBoxContainer.addEventListener('click', preventAll);
+
+            barBoxContainer.__fix_progress_bar = () => {
+                onPauseEnd();
+                init();
+            };
         },
 
         updateAllVideoVolume: (volume) => {
@@ -166,6 +171,12 @@
             for (const video of document.querySelectorAll('video')) {
                 video.volume = volume;
                 // instagram already handles mute sync
+            }
+        },
+
+        fixProgressBars: () => {
+            for (const bar of document.querySelectorAll('.usy-progress-bar-container')) {
+                bar.__fix_progress_bar?.();
             }
         },
 
@@ -230,8 +241,15 @@
             }
         },
 
+        /**
+         * @param {HTMLElement} e
+         * @returns {HTMLElement | null}
+         */
         getClosestReelContainer: (e) => e.closest('div.x78zum5.xedcshv'),
 
+        /**
+         * @type {(reel: HTMLElement) => void}
+         */
         preventExtraMenus: (() => {
             /**
              * @param {MouseEvent} e
@@ -271,6 +289,10 @@
             }
         }
     };
+
+    document.addEventListener('click', () => {
+        setTimeout(Video.fixProgressBars, 100);
+    }, {capture: true});
 
     window.addEventListener('keydown', (e) => {
         if (onReels && e.key.toLowerCase() === Settings.preferences.custom_like_key.toLowerCase()) {
