@@ -258,7 +258,7 @@
         },
 
         ClearAll: async () => {
-            for (const reel of document.body.querySelectorAll('video[usy-progress-bar], *:has(> [aria-label^="Audio is "]):not([usy-volume-bar]), video[usy-prevent-extra-menu]')) {
+            for (const reel of document.body.querySelectorAll('video[usy-progress-bar], *:has(> [aria-label^="Audio is "])[usy-volume-bar], video[usy-prevent-extra-menu]')) {
                 reel.removeAttribute('usy-progress-bar');
                 reel.removeAttribute('usy-volume-bar');
                 reel.removeAttribute('usy-prevent-extra-menu');
