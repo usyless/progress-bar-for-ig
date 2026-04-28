@@ -44,6 +44,9 @@
 
     let onReels = location.pathname.includes('/reels/');
 
+    /** @type {Set<HTMLElement>} */
+    let progress_bar_containers = new Set();
+
     /**
      * @param {Event} e
      */
@@ -69,6 +72,7 @@
             barBoxContainer.appendChild(bar);
             const setWidth = () => bar.style.width = `${(reel.currentTime / duration) * 100}%`;
             reel.after(barBoxContainer);
+            progress_bar_containers.add(barBoxContainer);
 
             const init = () => {
                 reel.volume = Settings.video_status.volume;
@@ -147,8 +151,9 @@
         },
 
         fixProgressBars: () => {
-            for (const bar of document.querySelectorAll('.usy-progress-bar-container')) {
-                bar.__fix_progress_bar?.();
+            for (const bar of progress_bar_containers) {
+                if (bar.isConnected) bar.__fix_progress_bar?.();
+                else progress_bar_containers.delete(bar);
             }
         },
 
@@ -269,9 +274,7 @@
         }
     };
 
-    document.addEventListener('click', () => {
-        setTimeout(Video.fixProgressBars, 100);
-    }, {capture: true});
+    setInterval(Video.fixProgressBars, 1000);
 
     window.addEventListener('keydown', (e) => {
         if (onReels && e.key.toLowerCase() === Settings.preferences.custom_like_key.toLowerCase()) {
