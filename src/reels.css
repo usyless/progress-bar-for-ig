@@ -147,8 +147,3 @@
         }
     }
 }
-
-/*fix the volume bar not being clickable*/
-.x1ja2u2z:has(video) {
-    z-index: unset !important;
-}

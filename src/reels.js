@@ -57,9 +57,14 @@
     };
 
     const Video = {
-        /** @param {HTMLVideoElement} reel */
-        addProgressBar: (reel) => {
-            for (const c of reel.parentElement.querySelectorAll('.usy-progress-bar-container')) c.remove();
+        /** @param {HTMLElement} parent */
+        addProgressBar: (parent) => {
+            const holding_element = parent.querySelector('[data-instancekey]');
+            const reel = parent.querySelector('video');
+
+            if (!holding_element || !reel) return;
+
+            for (const c of holding_element.querySelectorAll('.usy-progress-bar-container')) c.remove();
             let holding = false, duration;
 
             const barBoxContainer = document.createElement('div');
@@ -71,7 +76,7 @@
             if (!Settings.preferences.show_progress) barBoxContainer.classList.add('no-progress');
             barBoxContainer.appendChild(bar);
             const setWidth = () => bar.style.width = `${(reel.currentTime / duration) * 100}%`;
-            reel.after(barBoxContainer);
+            holding_element.appendChild(barBoxContainer);
             progress_bar_containers.add(barBoxContainer);
 
             const init = () => {
@@ -248,8 +253,8 @@
         },
 
         addProgressBars: () => {
-            for (const reel of document.body.querySelectorAll('video:not([usy-progress-bar])')) {
-                reel.setAttribute('usy-progress-bar', '');
+            for (const reel of document.body.querySelectorAll('*:has(> [data-instancekey]):has(video)')) {
+                if (reel.querySelector('.usy-progress-bar-container')) continue;
                 Video.addProgressBar(reel);
             }
             for (const volume of document.body.querySelectorAll('*:has(> [aria-label^="Audio is "]):not([usy-volume-bar])')) {
@@ -265,8 +270,7 @@
         },
 
         ClearAll: async () => {
-            for (const reel of document.body.querySelectorAll('video[usy-progress-bar], *:has(> [aria-label^="Audio is "])[usy-volume-bar], video[usy-prevent-extra-menu]')) {
-                reel.removeAttribute('usy-progress-bar');
+            for (const reel of document.body.querySelectorAll('*:has(> [aria-label^="Audio is "])[usy-volume-bar], video[usy-prevent-extra-menu]')) {
                 reel.removeAttribute('usy-volume-bar');
                 reel.removeAttribute('usy-prevent-extra-menu');
             }
