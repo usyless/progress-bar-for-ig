@@ -259,9 +259,9 @@
                 Video.addProgressBar(reel);
             }
             if (Settings.preferences.show_volume) {
-                for (const volume of document.body.querySelectorAll('*:has(> [aria-label^="Audio is "]):not([usy-volume-bar])')) {
-                    volume.setAttribute('usy-volume-bar', '');
-                    Video.addVolumeBar(volume);
+                for (const volume of document.body.querySelectorAll('[aria-label^="Audio is "]')) {
+                    if (volume.parentElement.querySelector('.usy-volume-bar-container')) continue;
+                    Video.addVolumeBar(volume.parentElement);
                 }
             }
             if (onReels && Settings.preferences.prevent_extra_menus) {
@@ -273,8 +273,7 @@
         },
 
         ClearAll: async () => {
-            for (const reel of document.body.querySelectorAll('*:has(> [aria-label^="Audio is "])[usy-volume-bar], video[usy-prevent-extra-menu]')) {
-                reel.removeAttribute('usy-volume-bar');
+            for (const reel of document.body.querySelectorAll('video[usy-prevent-extra-menu]')) {
                 reel.removeAttribute('usy-prevent-extra-menu');
             }
             for (const element of document.body.querySelectorAll('.usy-volume-bar-container, .usy-progress-bar-container')) {
