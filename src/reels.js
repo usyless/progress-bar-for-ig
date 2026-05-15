@@ -320,6 +320,7 @@
             if (Object.hasOwn(changes, 'video_status')) {
                 const current_volume = Settings.video_status.volume;
                 Settings.loadSettings(['video_status']).then(() => {
+                    if (!Settings.preferences.show_volume) return;
                     if (Settings.video_status.volume !== current_volume) Video.updateGlobalVolume(Settings.video_status.volume);
                 });
             }
