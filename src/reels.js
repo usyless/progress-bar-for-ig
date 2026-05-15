@@ -91,7 +91,7 @@
             progress_bar_containers.add(barBoxContainer);
 
             const init = () => {
-                reel.volume = Settings.video_status.volume;
+                if (Settings.preferences.show_volume) reel.volume = Settings.video_status.volume;
                 if (duration) {
                     barBoxContainer.style.setProperty('--time', `"${formatTime(reel.currentTime)}/${formatTime(duration)}"`);
                     if (!holding && !reel.paused) {
