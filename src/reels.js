@@ -178,6 +178,7 @@
             const updateVolume = (e) => {
                 const {left, width} = volumeBarContainer.getBoundingClientRect();
                 const volume = Math.max(0, Math.min((e.clientX - left) / width, 1.0));
+                volumeBar.style.width = `${volume * 100}%`;
                 Video.updateGlobalVolume(volume);
             }
 
@@ -209,20 +210,27 @@
          * @type {(volume: Number) => void}
          */
         updateGlobalVolume: (() => {
-            let volumeTimer;
-            return (volume) => {
-                clearTimeout(volumeTimer);
-                const volume_attr = `${volume * 100}%`;
+            let latestVolume;
+            let ticking = false;
+
+            const cb = () => {
+                const volume_attr = `${latestVolume * 100}%`;
                 for (const elem of document.querySelectorAll('video, .usy-volume-bar')) {
-                    if (elem.nodeName === 'VIDEO') elem.volume = volume;
+                    if (elem.nodeName === 'VIDEO') elem.volume = latestVolume;
                     else elem.style.width = volume_attr;
                 }
-                if (Settings.video_status.volume !== volume) {
-                    volumeTimer = setTimeout(() => {
-                        Settings.video_status.volume = volume;
-                        void Settings.updateVideoStatus();
-                    }, 100);
+                if (Settings.video_status.volume !== latestVolume) {
+                    Settings.video_status.volume = latestVolume;
+                    void Settings.updateVideoStatus();
                 }
+                ticking = false;
+            };
+
+            return (volume) => {
+                latestVolume = volume;
+                if (ticking) return;
+                ticking = true;
+                setTimeout(cb, 200);
             };
         })(),
 
