@@ -24,6 +24,12 @@ if (typeof browser === 'undefined') {
                 default: true
             },
             {
+                name: 'show_volume',
+                description: 'Show this extensions volume bars: disable if interfering with the native ones (if you have them)',
+                category: 'preferences',
+                default: true
+            },
+            {
                 name: 'prevent_extra_menus',
                 description: 'Prevent the "liked by" menu appearing when clicking the likes number on reels',
                 category: 'preferences',

@@ -10,6 +10,7 @@
         preferences: {
             show_bar: true,
             show_progress: true,
+            show_volume: true,
             prevent_extra_menus: false,
             custom_like_key: ''
         },
@@ -257,9 +258,11 @@
                 if (reel.querySelector('.usy-progress-bar-container')) continue;
                 Video.addProgressBar(reel);
             }
-            for (const volume of document.body.querySelectorAll('*:has(> [aria-label^="Audio is "]):not([usy-volume-bar])')) {
-                volume.setAttribute('usy-volume-bar', '');
-                Video.addVolumeBar(volume);
+            if (Settings.preferences.show_volume) {
+                for (const volume of document.body.querySelectorAll('*:has(> [aria-label^="Audio is "]):not([usy-volume-bar])')) {
+                    volume.setAttribute('usy-volume-bar', '');
+                    Video.addVolumeBar(volume);
+                }
             }
             if (onReels && Settings.preferences.prevent_extra_menus) {
                 for (const reel of document.body.querySelectorAll('video:not([usy-prevent-extra-menu])')) {
