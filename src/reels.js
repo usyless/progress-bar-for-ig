@@ -57,6 +57,16 @@
         e.stopImmediatePropagation();
     };
 
+    /**
+     * @param {HTMLElement} element
+     * @returns {boolean}
+     */
+    const checkCenterHitTest = (element) => {
+        const {left, top, width, height} = element.getBoundingClientRect();
+        const topElement = document.elementFromPoint(left + width / 2, top + height / 2);
+        return Boolean(topElement === element || element.contains(topElement));
+    }
+
     const Video = {
         /** @param {HTMLElement} parent */
         addProgressBar: (parent) => {
@@ -195,6 +205,8 @@
             volumeBarContainer.addEventListener('click', preventAll);
 
             volumeBarContainer.addEventListener('pointerdown', (e) => {
+                if (!checkCenterHitTest(volumeBarContainer)) return;
+
                 preventAll(e);
 
                 volumeBar.classList.add('usy-holding');
