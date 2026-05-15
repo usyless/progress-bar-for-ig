@@ -25,7 +25,7 @@ if (typeof browser === 'undefined') {
             },
             {
                 name: 'show_volume',
-                description: 'Show this extensions volume bars: disable if interfering with the native ones (if you have them)',
+                description: 'Show volume bars: disable if interfering with the native ones (if you have them)',
                 category: 'preferences',
                 default: true
             },
