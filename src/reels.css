@@ -1,3 +1,21 @@
+.usy-show-bar-on-any-hover [data-instancekey]:has(> :first-child:hover) .usy-progress-bar {
+    height: 6px;
+    opacity: 1;
+
+    &::after {
+        opacity: 0.2;
+        height: 6px;
+    }
+}
+
+.usy-show-bar-on-any-hover [data-instancekey]:has(> :first-child:hover) .usy-progress-bar-container {
+    background: linear-gradient(to bottom, transparent, #00000066);
+
+    &::after {
+        opacity: 1;
+    }
+}
+
 .usy-progress-bar-container {
     box-sizing: border-box;
     border-width: 0;

@@ -1,11 +1,11 @@
-'use strict';
-
-if (typeof browser === 'undefined') {
-    var browser = chrome;
-}
-
 (() => {
-    document.getElementById('versionDisplay').textContent += chrome?.runtime?.getManifest?.()?.version;
+    'use strict';
+    /** @type {typeof browser} */
+    const extension = (Number((browser || chrome).runtime.getManifest().manifest_version) === 2) ? browser : (() => {
+        return chrome;
+    })();
+
+    document.getElementById('versionDisplay').textContent += extension.runtime?.getManifest?.()?.version;
 
     const DIV = document.getElementById('settings');
 
@@ -22,6 +22,12 @@ if (typeof browser === 'undefined') {
                 description: 'Show the current video time when hovering over the progress bar',
                 category: 'preferences',
                 default: true
+            },
+            {
+                name: 'show_bar_on_any_hover',
+                description: 'Show the progress bar whenever hovering over the video',
+                category: 'preferences',
+                default: false
             },
             {
                 name: 'show_volume',
@@ -95,7 +101,7 @@ if (typeof browser === 'undefined') {
         DIV.appendChild(outer);
     }
 
-    chrome.storage.local.get(valuesToUpdate.map(i => i.obj.category ?? i.obj.name), (s) => {
+    extension.storage.local.get(valuesToUpdate.map(i => i.obj.category ?? i.obj.name)).then((s) => {
         for (const {obj, func} of valuesToUpdate) {
             if (obj.category != null) func(s[obj.category]?.[obj.name] ?? obj.default);
             else func(s[obj.name] ?? obj.default);
@@ -120,7 +126,7 @@ if (typeof browser === 'undefined') {
     }
 
     function update_value(e, obj, property) {
-        chrome.storage.local.get([obj.category ?? obj.name], (r) => {
+        extension.storage.local.get([obj.category ?? obj.name]).then((r) => {
             if (obj.category != null) {
                 if (r[obj.category] == null) r[obj.category] = {};
                 r[obj.category][obj.name] = e.target[property];
@@ -132,10 +138,10 @@ if (typeof browser === 'undefined') {
     }
 
     function setStorage(data) {
-        chrome.storage.local.set(data); // potentially add little saved message with .then
+        extension.storage.local.set(data); // potentially add little saved message with .then
     }
 
     function clearStorage() {
-        chrome.storage.local.clear();
+        extension.storage.local.clear();
     }
 })();

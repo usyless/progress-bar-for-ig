@@ -2,7 +2,7 @@
     'use strict';
     // set browser to chrome if not in firefox
     /** @type {typeof browser} */
-    const extension = typeof browser !== 'undefined' ? browser : (() => {
+    const extension = (Number((browser || chrome).runtime.getManifest().manifest_version) === 2) ? browser : (() => {
         return chrome;
     })();
 
@@ -10,6 +10,7 @@
         preferences: {
             show_bar: true,
             show_progress: true,
+            show_bar_on_any_hover: false,
             show_volume: true,
             prevent_extra_menus: false,
             custom_like_key: ''
@@ -274,6 +275,12 @@
         },
 
         addProgressBars: () => {
+            if (Settings.preferences.show_bar_on_any_hover) {
+                document.documentElement?.classList?.add?.('usy-show-bar-on-any-hover');
+            } else {
+                document.documentElement?.classList?.remove?.('usy-show-bar-on-any-hover');
+            }
+
             for (const reel of document.body.querySelectorAll('*:has(> [data-instancekey]):has(video)')) {
                 if (reel.querySelector('.usy-progress-bar-container')) continue;
                 Video.addProgressBar(reel);
