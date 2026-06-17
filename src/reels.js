@@ -49,6 +49,8 @@
     /** @type {Set<HTMLElement>} */
     let progress_bar_containers = new Set();
 
+    let isInternalVolumeChange = false;
+
     /**
      * @param {Event} e
      */
@@ -91,8 +93,15 @@
             holding_element.appendChild(barBoxContainer);
             progress_bar_containers.add(barBoxContainer);
 
+            const initVolume = () => {
+                if (Settings.preferences.show_volume) {
+                    isInternalVolumeChange = true;
+                    reel.volume = Settings.video_status.volume;
+                    isInternalVolumeChange = false;
+                }
+            };
+
             const init = () => {
-                if (Settings.preferences.show_volume) reel.volume = Settings.video_status.volume;
                 if (duration) {
                     barBoxContainer.style.setProperty('--time', `"${formatTime(reel.currentTime)}/${formatTime(duration)}"`);
                     if (!holding && !reel.paused) {
@@ -112,6 +121,7 @@
                 const initialiseDuration = () => {
                     duration = reel.duration;
                     setWidth();
+                    initVolume();
                 };
                 if (reel.readyState >= 1) initialiseDuration();
                 else reel.addEventListener('loadedmetadata', initialiseDuration, {once: true});
@@ -121,6 +131,11 @@
             reel.addEventListener('play', init);
             reel.addEventListener('pause', onPauseEnd);
             reel.addEventListener('timeupdate', init);
+
+            reel.addEventListener('volumechange', () => {
+                if (isInternalVolumeChange) return;
+                Video.updateGlobalVolume(reel.volume);
+            });
 
             const updateBarFromMouse = (e) => {
                 const box = barBoxContainer.getBoundingClientRect();
@@ -228,10 +243,12 @@
 
             const cb = () => {
                 const volume_attr = `${latestVolume * 100}%`;
+                isInternalVolumeChange = true;
                 for (const elem of document.querySelectorAll('video, .usy-volume-bar')) {
                     if (elem.nodeName === 'VIDEO') elem.volume = latestVolume;
                     else elem.style.width = volume_attr;
                 }
+                isInternalVolumeChange = false;
                 if (Settings.video_status.volume !== latestVolume) {
                     Settings.video_status.volume = latestVolume;
                     void Settings.updateVideoStatus();
