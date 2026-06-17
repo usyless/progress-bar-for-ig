@@ -191,6 +191,8 @@
 
         /** @param {HTMLElement} mute_button */
         addVolumeBar: (mute_button) => {
+            if (mute_button.closest('[role="slider"][aria-valuemin][aria-valuemax][aria-valuenow]')) return;
+
             for (const c of mute_button.parentElement.querySelectorAll('.usy-volume-bar-container')) c.remove();
             mute_button.classList.add('usy-volume-bar-button');
 
