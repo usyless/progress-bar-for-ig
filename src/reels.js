@@ -50,6 +50,9 @@
     let progress_bar_containers = new Set();
 
     let isInternalVolumeChange = false;
+    const disableInternalVolumeChange = () =>{
+        isInternalVolumeChange = false;
+    };
 
     /**
      * @param {Event} e
@@ -97,7 +100,7 @@
                 if (Settings.preferences.show_volume) {
                     isInternalVolumeChange = true;
                     reel.volume = Settings.video_status.volume;
-                    isInternalVolumeChange = false;
+                    setTimeout(disableInternalVolumeChange, 0);
                 }
             };
 
@@ -250,7 +253,7 @@
                     if (elem.nodeName === 'VIDEO') elem.volume = latestVolume;
                     else elem.style.width = volume_attr;
                 }
-                isInternalVolumeChange = false;
+                setTimeout(disableInternalVolumeChange, 0);
                 if (Settings.video_status.volume !== latestVolume) {
                     Settings.video_status.volume = latestVolume;
                     void Settings.updateVideoStatus();
