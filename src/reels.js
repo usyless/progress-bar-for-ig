@@ -81,11 +81,20 @@
 
             if (!holding_element || !reel) return;
 
+            const reel_identifier = reel.getAttribute('usy-pbfig-identifier');
+            const pb_identifier = holding_element.querySelector('.usy-progress-bar-container')?.getAttribute('usy-pbfig-identifier');
+
+            if ((reel_identifier && pb_identifier) && (reel_identifier === pb_identifier)) return;
+
             for (const c of holding_element.querySelectorAll('.usy-progress-bar-container')) c.remove();
             let holding = false, duration;
 
+            const identifier = Math.random().toString(36).slice(2);
+            reel.setAttribute('usy-pbfig-identifier', identifier);
+
             const barBoxContainer = document.createElement('div');
             barBoxContainer.classList.add('usy-progress-bar-container');
+            barBoxContainer.setAttribute('usy-pbfig-identifier', identifier);
 
             const bar = document.createElement('div');
             bar.classList.add('usy-progress-bar');
@@ -304,7 +313,6 @@
             }
 
             for (const reel of document.body.querySelectorAll('*:has(> [data-instancekey]):has(video)')) {
-                if (reel.querySelector('.usy-progress-bar-container')) continue;
                 Video.addProgressBar(reel);
             }
             if (Settings.preferences.show_volume) {
